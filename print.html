@@ -1,0 +1,839 @@
+<!DOCTYPE HTML>
+<html lang="en" class="light sidebar-visible" dir="ltr">
+    <head>
+        <!-- Book generated using mdBook -->
+        <meta charset="UTF-8">
+        <title>Rustyscript Documentation</title>
+        <meta name="robots" content="noindex">
+
+
+        <!-- Custom HTML head -->
+
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="theme-color" content="#ffffff">
+
+        <link rel="icon" href="favicon.svg">
+        <link rel="shortcut icon" href="favicon.png">
+        <link rel="stylesheet" href="css/variables.css">
+        <link rel="stylesheet" href="css/general.css">
+        <link rel="stylesheet" href="css/chrome.css">
+        <link rel="stylesheet" href="css/print.css" media="print">
+
+        <!-- Fonts -->
+        <link rel="stylesheet" href="FontAwesome/css/font-awesome.css">
+        <link rel="stylesheet" href="fonts/fonts.css">
+
+        <!-- Highlight.js Stylesheets -->
+        <link rel="stylesheet" href="highlight.css">
+        <link rel="stylesheet" href="tomorrow-night.css">
+        <link rel="stylesheet" href="ayu-highlight.css">
+
+        <!-- Custom theme stylesheets -->
+
+
+        <!-- Provide site root to javascript -->
+        <script>
+            var path_to_root = "";
+            var default_theme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "navy" : "light";
+        </script>
+        <!-- Start loading toc.js asap -->
+        <script src="toc.js"></script>
+    </head>
+    <body>
+    <div id="body-container">
+        <!-- Work around some values being stored in localStorage wrapped in quotes -->
+        <script>
+            try {
+                var theme = localStorage.getItem('mdbook-theme');
+                var sidebar = localStorage.getItem('mdbook-sidebar');
+
+                if (theme.startsWith('"') && theme.endsWith('"')) {
+                    localStorage.setItem('mdbook-theme', theme.slice(1, theme.length - 1));
+                }
+
+                if (sidebar.startsWith('"') && sidebar.endsWith('"')) {
+                    localStorage.setItem('mdbook-sidebar', sidebar.slice(1, sidebar.length - 1));
+                }
+            } catch (e) { }
+        </script>
+
+        <!-- Set the theme before any content is loaded, prevents flash -->
+        <script>
+            var theme;
+            try { theme = localStorage.getItem('mdbook-theme'); } catch(e) { }
+            if (theme === null || theme === undefined) { theme = default_theme; }
+            const html = document.documentElement;
+            html.classList.remove('light')
+            html.classList.add(theme);
+            html.classList.add("js");
+        </script>
+
+        <input type="checkbox" id="sidebar-toggle-anchor" class="hidden">
+
+        <!-- Hide / unhide sidebar before it is displayed -->
+        <script>
+            var sidebar = null;
+            var sidebar_toggle = document.getElementById("sidebar-toggle-anchor");
+            if (document.body.clientWidth >= 1080) {
+                try { sidebar = localStorage.getItem('mdbook-sidebar'); } catch(e) { }
+                sidebar = sidebar || 'visible';
+            } else {
+                sidebar = 'hidden';
+            }
+            sidebar_toggle.checked = sidebar === 'visible';
+            html.classList.remove('sidebar-visible');
+            html.classList.add("sidebar-" + sidebar);
+        </script>
+
+        <nav id="sidebar" class="sidebar" aria-label="Table of contents">
+            <!-- populated by js -->
+            <mdbook-sidebar-scrollbox class="sidebar-scrollbox"></mdbook-sidebar-scrollbox>
+            <noscript>
+                <iframe class="sidebar-iframe-outer" src="toc.html"></iframe>
+            </noscript>
+            <div id="sidebar-resize-handle" class="sidebar-resize-handle">
+                <div class="sidebar-resize-indicator"></div>
+            </div>
+        </nav>
+
+        <div id="page-wrapper" class="page-wrapper">
+
+            <div class="page">
+                <div id="menu-bar-hover-placeholder"></div>
+                <div id="menu-bar" class="menu-bar sticky">
+                    <div class="left-buttons">
+                        <label id="sidebar-toggle" class="icon-button" for="sidebar-toggle-anchor" title="Toggle Table of Contents" aria-label="Toggle Table of Contents" aria-controls="sidebar">
+                            <i class="fa fa-bars"></i>
+                        </label>
+                        <button id="theme-toggle" class="icon-button" type="button" title="Change theme" aria-label="Change theme" aria-haspopup="true" aria-expanded="false" aria-controls="theme-list">
+                            <i class="fa fa-paint-brush"></i>
+                        </button>
+                        <ul id="theme-list" class="theme-popup" aria-label="Themes" role="menu">
+                            <li role="none"><button role="menuitem" class="theme" id="light">Light</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="rust">Rust</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="coal">Coal</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="navy">Navy</button></li>
+                            <li role="none"><button role="menuitem" class="theme" id="ayu">Ayu</button></li>
+                        </ul>
+                        <button id="search-toggle" class="icon-button" type="button" title="Search. (Shortkey: s)" aria-label="Toggle Searchbar" aria-expanded="false" aria-keyshortcuts="S" aria-controls="searchbar">
+                            <i class="fa fa-search"></i>
+                        </button>
+                    </div>
+
+                    <h1 class="menu-title">Rustyscript Documentation</h1>
+
+                    <div class="right-buttons">
+                        <a href="print.html" title="Print this book" aria-label="Print this book">
+                            <i id="print-button" class="fa fa-print"></i>
+                        </a>
+
+                    </div>
+                </div>
+
+                <div id="search-wrapper" class="hidden">
+                    <form id="searchbar-outer" class="searchbar-outer">
+                        <input type="search" id="searchbar" name="searchbar" placeholder="Search this book ..." aria-controls="searchresults-outer" aria-describedby="searchresults-header">
+                    </form>
+                    <div id="searchresults-outer" class="searchresults-outer hidden">
+                        <div id="searchresults-header" class="searchresults-header"></div>
+                        <ul id="searchresults">
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Apply ARIA attributes after the sidebar and the sidebar toggle button are added to the DOM -->
+                <script>
+                    document.getElementById('sidebar-toggle').setAttribute('aria-expanded', sidebar === 'visible');
+                    document.getElementById('sidebar').setAttribute('aria-hidden', sidebar !== 'visible');
+                    Array.from(document.querySelectorAll('#sidebar a')).forEach(function(link) {
+                        link.setAttribute('tabIndex', sidebar === 'visible' ? 0 : -1);
+                    });
+                </script>
+
+                <div id="content" class="content">
+                    <main>
+                        <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<p><a href="https://crates.io/crates/rustyscript/"><img src="https://img.shields.io/crates/v/rustyscript.svg" alt="Crates.io" /></a>
+<a href="https://github.com/rscarson/rustyscript/actions?query=branch%3Amaster"><img src="https://github.com/rscarson/rustyscript/actions/workflows/tests.yml/badge.svg?branch=master" alt="Build Status" /></a>
+<a href="https://raw.githubusercontent.com/rscarson/rustyscript/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a></p>
+<h2 id="rustyscript---effortless-js-integration-for-rust"><a class="header" href="#rustyscript---effortless-js-integration-for-rust">Rustyscript - Effortless JS Integration for Rust</a></h2>
+<p>This crate is meant to provide a quick and simple way to integrate a runtime javascript or typescript component from within rust.</p>
+<p>It uses the v8 engine through the <code>deno_core</code> crate, and is meant to be as simple as possible to use without sacrificing flexibility or performance.</p>
+<p>I also have attempted to abstract away the v8 engine details so you can for the most part operate directly on rust types.</p>
+<ul>
+<li>By default, the code being run is entirely sandboxed from the host, having no filesystem or network access.
+<ul>
+<li>It can be extended to include those capabilities and more if desired - See the <a href="getting_started/../extensions">extensions</a> section for more information</li>
+</ul>
+</li>
+<li>Asynchronous JS code is supported (I suggest using the timeout option when creating your runtime)</li>
+<li>Loaded JS modules can import other modules</li>
+<li>Typescript is supported by default, and will be transpiled into JS for execution</li>
+<li>Node JS is supported experimentally, but is not yet fully compatible <a href="getting_started/../advanced/nodejs_compatibility.html">See the NodeJS Compatibility section</a></li>
+</ul>
+<p>The crate includes the following features that can be turned on or off as needed:</p>
+<h4 id="extension-features"><a class="header" href="#extension-features">Extension Features</a></h4>
+<p>For a full list of available extensions, see the <a href="getting_started/../extensions">extensions</a> section.</p>
+<blockquote>
+<p><strong><code>safe_extensions</code></strong> <code>ON BY DEFAULT</code><br />
+Deno extensions that maintain a secure, sandboxed runtime environment</p>
+</blockquote>
+<blockquote>
+<p><strong><code>io_extensions</code></strong><br />
+Deno extensions that grant runtimes access to the file system (but may also grant some level of network access - use caution)</p>
+</blockquote>
+<blockquote>
+<p><strong><code>network_extensions</code></strong><br />
+Deno extensions that grant runtimes access to system network resources</p>
+</blockquote>
+<h4 id="javascript-isolation-features"><a class="header" href="#javascript-isolation-features">Javascript Isolation Features</a></h4>
+<blockquote>
+<p><strong><code>url_import</code></strong><br />
+Enables executed Javascript to include modules from arbitrary URLs</p>
+</blockquote>
+<blockquote>
+<p><strong><code>fs_import</code></strong><br />
+Enables executed Javascript to include modules from the file system, without needing to load them from rust first</p>
+</blockquote>
+<h4 id="additional-features"><a class="header" href="#additional-features">Additional Features</a></h4>
+<blockquote>
+<p><strong><code>worker</code></strong> <code>ON BY DEFAULT</code><br />
+Enables the multithreaded <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/index.html"><code>worker</code></a> API</p>
+</blockquote>
+<blockquote>
+<p><strong><code>snapshot_builder</code></strong><br />
+Enables the <a href="getting_started/../advanced/snapshots.html"><code>snapshot_builder</code></a> API</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-1"><a class="header" href="#getting-started-1">Getting Started</a></h1>
+<h2 id="hello-world"><a class="header" href="#hello-world">Hello World</a></h2>
+<p>Here is a very basic use of this crate to execute a JS module. It will:</p>
+<ul>
+<li>Create a basic runtime</li>
+<li>Load a javascript module,</li>
+<li>Call a function and the resulting value</li>
+</ul>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{json_args, Runtime, Module};
+
+fn main() -&gt; Result&lt;(), rustyscript::Error&gt; {
+    let module = Module::new(
+        "test.js",
+        "
+        export default (string, integer) =&gt; {
+            console.log(`Hello world: string=${string}, integer=${integer}`);
+            return 2;
+        }
+        "
+    );
+
+    let value: usize = Runtime::execute_module(
+        &amp;module, vec![],
+        Default::default(),
+        json_args!("test", 5)
+    )?;
+
+    assert_eq!(value, 2);
+    Ok(())
+}</code></pre></pre>
+<p>Modules can also be loaded from the filesystem with <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Module.html#method.load"><code>Module::load</code></a> or <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Module.html#method.load_dir"><code>Module::load_dir</code></a><br />
+Or included statically with the <a href="https://docs.rs/rustyscript/latest/rustyscript/macro.module.html"><code>module!</code></a> and <a href="https://docs.rs/rustyscript/latest/rustyscript/macro.include_module.html"><code>include_module!</code></a> macros.</p>
+<hr />
+<p>Here is a more detailed version example above, which breaks down the steps instead of using the one-liner <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.execute_module"><code>Runtime::execute_module</code></a>:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{json_args, Runtime, RuntimeOptions, Module, Undefined};
+use std::time::Duration;
+
+fn main() -&gt; Result&lt;(), rustyscript::Error&gt; {
+    let module = Module::new(
+        "test.js",
+        "
+        let internalValue = 0;
+        export const load = (value) =&gt; internalValue = value;
+        export const getValue = () =&gt; internalValue;
+        "
+    );
+
+    // Create a new runtime
+    let mut runtime = Runtime::new(RuntimeOptions {
+        timeout: Duration::from_millis(50), // Stop execution by force after 50ms
+        default_entrypoint: Some("load".to_string()), // Run this as the entrypoint function if none is registered
+        ..Default::default()
+    })?;
+
+    // The handle returned is used to get exported functions and values from that module.
+    // We then call the entrypoint function, but do not need a return value.
+    // Load can be called multiple times, and modules can import other loaded modules
+    // Using `import './filename.js'`
+    let module_handle = runtime.load_module(&amp;module)?;
+    runtime.call_entrypoint::&lt;Undefined&gt;(&amp;module_handle, json_args!(2))?;
+
+    // Functions don't need to be the entrypoint to be callable!
+    let _internal_value: i64 = runtime.call_function(Some(&amp;module_handle), "getValue", json_args!())?;
+    Ok(())
+}</code></pre></pre>
+<h3 id="single-expression-evaluation"><a class="header" href="#single-expression-evaluation">Single Expression Evaluation</a></h3>
+<p>If all you need is the result of a single javascript expression, you can use:</p>
+<pre><pre class="playground"><code class="language-rust">fn main() {
+    let result: i64 = rustyscript::evaluate("5 + 5").expect("The expression was invalid!");
+    assert_eq!(result, 10);
+}</code></pre></pre>
+<hr />
+<p>Or, if you just need to import one Javascript module for use in rust:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{json_args, import};
+
+fn main() {
+    let mut module = import("js/my_module.js").expect("Something went wrong!");
+    let value: String = module.call("exported_function_name", json_args!()).expect("Could not get a value!");
+    println!("{value}");
+}</code></pre></pre>
+<p>There are a few other utilities included, such as <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.validate.html"><code>validate</code></a> and <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.resolve_path.html"><code>resolve_path</code></a></p>
+<hr />
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-2"><a class="header" href="#getting-started-2">Getting Started</a></h1>
+<h2 id="on-modules-and-including-them"><a class="header" href="#on-modules-and-including-them">On Modules and Including them</a></h2>
+<p>By default, any javascript code can only import modules that have already been loaded with <a href="https://docs.rs/rustyscript/latest/rustyscript/runtime/struct.Runtime.html#method.load_module"><code>Runtime::load_module</code></a>. This is a security feature to prevent arbitrary code from being loaded from the filesystem or network.</p>
+<h3 id="url-schemes"><a class="header" href="#url-schemes">URL Schemes</a></h3>
+<p>However, this can be changed with the <code>fs_import</code> and <code>url_import</code> features. These features allow the runtime to load modules from the filesystem or network respectively.</p>
+<p>Custom URL Schemes can be added to a runtime with the <code>schema_whlist</code> field in the <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a> struct.</p>
+<ul>
+<li><a href="https://github.com/rscarson/rustyscript/blob/master/examples/runtime_extensions.rs">Usage Example</a></li>
+</ul>
+<h3 id="entrypoints"><a class="header" href="#entrypoints">Entrypoints</a></h3>
+<p>When a module is loaded, the runtime will look for a function with the name provided in the <code>default_entrypoint</code> field of the <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a> struct, or which is exported as <code>default</code> in the module.</p>
+<p>Additionally, you can call <code>rustyscript.register_entrypoint</code> from JS to register a function as an entrypoint at runtime</p>
+<p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html#method.call_entrypoint"><code>Runtime::call_entrypoint</code></a> will call the entrypoint function with the provided arguments.</p>
+<p><a href="https://github.com/rscarson/rustyscript/blob/master/examples/entrypoint_functions.rs">Example 1</a><br />
+<a href="https://github.com/rscarson/rustyscript/blob/master/examples/hello_world.rs">Example 2</a></p>
+<h3 id="importprovider-trait"><a class="header" href="#importprovider-trait">ImportProvider Trait</a></h3>
+<p>The <code>ImportProvider</code> trait can be implemented to provide custom module loading behavior</p>
+<ul>
+<li>It can be used to implement a cache: <a href="https://github.com/rscarson/rustyscript/blob/master/examples/module_loader_cache.rs">Example</a></li>
+<li>Or to provide custom import logic: <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_import_logic.rs">Example</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-3"><a class="header" href="#getting-started-3">Getting Started</a></h1>
+<h2 id="the-sandbox"><a class="header" href="#the-sandbox">The Sandbox</a></h2>
+<p>One of the guiding principles of <code>rustyscript</code> is to provide a safe sandboxed environment for running JavaScript code by default.</p>
+<blockquote>
+<p>It should not be possible to access the host system's resources such as the file system, network, or environment variables through JS in the default runtime configuration</p>
+</blockquote>
+<p>Only the <a href="getting_started/../extensions/safe_extensions.html"><code>safe_extensions</code></a>, <a href="getting_started/../advanced/multithreading.html"><code>worker</code></a>, and <a href="getting_started/../advanced/snapshots.html"><code>snapshot_builder</code></a> features can be enabled without breaking the sandbox.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-4"><a class="header" href="#getting-started-4">Getting Started</a></h1>
+<h2 id="runtime-options"><a class="header" href="#runtime-options">Runtime Options</a></h2>
+<p>To create a runtime, you will need to provide a <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a> struct. This struct contains all the configuration options for the runtime, such as the extensions to load, the entrypoint to use, and the maximum heap size.</p>
+<p>It implements the <code>Default</code> trait, so you can create a default configuration by calling <code>RuntimeOptions::default()</code>.</p>
+<p><code>RuntimeOptions</code> has the following fields:</p>
+<ul>
+<li><code>extensions</code>
+<ul>
+<li>A set of <code>deno_core</code> extensions to add to the runtime</li>
+<li>See <a href="getting_started/../advanced/custom_extensions.html">Custom Extensions</a></li>
+</ul>
+</li>
+<li><code>extension_options</code>
+<ul>
+<li>Additional options for the built-in extensions</li>
+<li>See <a href="getting_started/extension_options.html">Extension Options</a></li>
+</ul>
+</li>
+<li><code>default_entrypoint</code>
+<ul>
+<li>Function name to use as entrypoint if the module does not explicitely provide one</li>
+<li>See <a href="getting_started/modules.html">On Modules and import</a></li>
+</ul>
+</li>
+<li><code>timeout</code>
+<ul>
+<li>Amount of time to run async tasks before failing. Only affects blocking functions</li>
+</ul>
+</li>
+<li><code>max_heap_size</code>
+<ul>
+<li>Maximum heap size for the runtime. The runtime will fail gracefully if this limit is reached</li>
+</ul>
+</li>
+<li><code>import_provider</code>
+<ul>
+<li>Optional import provider for the module loader</li>
+<li>Acts as cache, and handler for custom schema prefixes and data sources</li>
+</ul>
+</li>
+<li><code>startup_snapshot</code>
+<ul>
+<li>Optional snapshot to load into the runtime</li>
+<li>This will reduce load times, but requires the same extensions to be loaded, in the same order</li>
+<li>If provided, user-supplied extensions must be instantiated with <code>init_ops</code> instead of <code>init_ops_and_esm</code></li>
+<li>WARNING: Snapshots MUST be used on the same system they were created on</li>
+<li>See <a href="getting_started/../advanced/snapshots.html">Snapshots</a></li>
+</ul>
+</li>
+<li><code>isolate_params</code>
+<ul>
+<li>Optional configuration parameters for building the underlying v8 isolate</li>
+<li>This can be used to alter the behavior of the runtime</li>
+<li>See <a href="https://docs.rs/v8/130.0.1/v8/struct.CreateParams.html">v8::CreateParams</a> for more information</li>
+</ul>
+</li>
+<li><code>shared_array_buffer_store</code>
+<ul>
+<li>Optional shared array buffer store to use for the runtime</li>
+<li>Allows data-sharing between runtimes across threads</li>
+</ul>
+</li>
+<li><code>schema_whlist</code>
+<ul>
+<li>A whitelist of custom schema prefixes that are allowed to be loaded from javascript</li>
+<li>By default only <code>http</code>/<code>https</code> (<code>url_import</code> crate feature), and <code>file</code> (<code>fs_import</code> crate feature) are allowed</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-5"><a class="header" href="#getting-started-5">Getting Started</a></h1>
+<h2 id="extension-options"><a class="header" href="#extension-options">Extension Options</a></h2>
+<p><a href="getting_started/runtime_options.html">Back to Runtime Options</a></p>
+<p>The built-in deno extensions have additional options that can be configured when creating a runtime. These options are provided in the<a href="https://docs.rs/rustyscript/latest/rustyscript/struct.ExtensionOptions.html"><code>ExtensionOptions</code></a> struct, which is a field of the <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a> struct.</p>
+<p>The fields it contains depend on the features enabled in the <code>rustyscript</code> crate. Here is a list of the fields and the features they depend on:</p>
+<ul>
+<li>
+<p>kv_store</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/kv.html"><code>kv</code></a> feature</li>
+<li>Defines the key-value store to use for the <code>deno_kv</code> extension</li>
+</ul>
+</li>
+<li>
+<p>broadcast_channel</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/broadcast_channel.html"><code>broadcast_channel</code></a> feature</li>
+<li>Defines the in-memory broadcast channel to use for the <code>deno_broadcast_channel</code> extension</li>
+</ul>
+</li>
+<li>
+<p>filesystem</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/fs.html"><code>fs</code></a> feature</li>
+<li>Defines the filesystem implementation to use for the <code>deno_fs</code> extension</li>
+<li>Default is <code>deno_fs::RealFs</code></li>
+</ul>
+</li>
+<li>
+<p>cache</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/cache.html"><code>cache</code></a> feature</li>
+<li>Defines the cache configuration to use for the <code>deno_cache</code> extension</li>
+</ul>
+</li>
+<li>
+<p>webstorage_origin_storage_dir</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/webstorage.html"><code>webstorage</code></a> feature</li>
+<li>Defines the directory where the webstorage extension will store its data</li>
+</ul>
+</li>
+<li>
+<p>io_pipes</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/io.html"><code>io</code></a> feature</li>
+<li>Defines the stdin/out/err pipes for the <code>deno_io</code> extension</li>
+</ul>
+</li>
+<li>
+<p>crypto_seed</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/crypto.html"><code>crypto</code></a> feature</li>
+<li>Defines the seed for the <code>deno_crypto</code> extension</li>
+</ul>
+</li>
+<li>
+<p>node_resolver</p>
+<ul>
+<li>Depends on the <a href="getting_started/../advanced/nodejs_compatibility.html"><code>node_experimental</code></a> feature</li>
+<li>Defines the package resolver to use for the <code>deno_node</code> extension</li>
+<li>The <code>RustyResolver</code> type allows you to select the base dir for modules and the filesystem implementation to use</li>
+</ul>
+</li>
+<li>
+<p>web</p>
+<ul>
+<li>Depends on the <a href="getting_started/../extensions/web.html"><code>web</code></a> feature</li>
+<li>Defines the options for the <code>deno_web</code>, <code>deno_fetch</code>, and <code>deno_net</code> extensions</li>
+<li>Also defines permissions for related APIs</li>
+<li>fields:
+<ul>
+<li>base_url: Base URL for some <code>deno_web</code> OPs</li>
+<li>user_agent: User agent to use for fetch</li>
+<li>root_cert_store_provider: Root certificate store for TLS connections for fetches and network OPs</li>
+<li>proxy: Proxy for fetch</li>
+<li>request_builder_hook: Request builder hook for fetch</li>
+<li>unsafely_ignore_certificate_errors: List of domain names or IP addresses to ignore SSL errors for</li>
+<li>client_cert_chain_and_key: Client certificate and key for fetch</li>
+<li>file_fetch_handler: File fetch handler for fetch</li>
+<li>permissions: Permissions manager for sandbox-breaking extensions</li>
+<li>blob_store: Blob store for the web related extensions</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="advanced-topics"><a class="header" href="#advanced-topics">Advanced Topics</a></h1>
+<p>This chapter will cover more advanced topics that may not be necessary for most users, but can be useful for those who need them.</p>
+<p>It will cover:</p>
+<ul>
+<li><a href="advanced/asynchronous_javascript.html">Managing asynchronous JS, including promises, and background tasks</a></li>
+<li><a href="advanced/calling_rust_from_javascript.html">Call sync and async rust from inside the JS runtime, as well as transfering data between the two</a></li>
+<li><a href="advanced/custom_extensions.html">Extending the JS runtime with more advanced custom functionality (extensions and op2)</a></li>
+<li><a href="advanced/multithreading.html">Running multiple runtimes in parallel, and sharing runtime data between threads</a></li>
+<li><a href="advanced/permissions.html">Restricting access from inside a non-sandboxed JS runtime</a></li>
+<li><a href="advanced/snapshots.html">Using snapshots to increase startup time</a></li>
+<li><a href="advanced/using_javascript_types_in_rust.html">Using javascript types in rust, and vice versa</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="snapshots"><a class="header" href="#snapshots">Snapshots</a></h1>
+<p>Deno's runtime supports the use of memory snapshots to skip the lengthy process of spinning up a new runtime and loading all the necessary code.
+This can give gains of ~10x in startup time, but comes with some caveats:</p>
+<ul>
+<li>The snapshot must be generated on the same system it will be used on</li>
+<li>The extensions in the snapshot builder runtime must be the same, and the same order as the runtime that will use the snapshot</li>
+<li>The <code>snapshot_builder</code> feature must be enabled on rustyscript - This feature DOES preserve the integrity of the sandbox</li>
+</ul>
+<h2 id="generating-a-snapshot"><a class="header" href="#generating-a-snapshot">Generating a snapshot</a></h2>
+<p>The snapshot must be provided to the runtime via the <code>startup_snapshot</code> field of <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a>, which as a type of <code>&amp;'static [u8]</code>.</p>
+<p>Therefore the snapshot will typically be created in <code>build.rs</code> (short of using <code>Box::leak</code>, lazy_static, or similar)</p>
+<p>The <a href="https://docs.rs/rustyscript/latest/rustyscript/snapshot_builder/struct.SnapshotBuilder.html"><code>SnapshotBuilder</code></a> struct is used to generate the snapshot, and can be used to pre-load modules into the snapshot. It has methods similar to the normal <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html"><code>Runtime</code></a> struct.</p>
+<p>Below is a sample that generates a snapshot with a pre-loaded module:</p>
+<p>You could also do this in <code>build.rs</code> and write to <code>concat!(env!("OUT_DIR"), "/snapshot.bin")</code></p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, SnapshotBuilder};
+use std::fs;
+
+static SNAPSHOT_PATH: &amp;str = "examples/snapshot.bin";
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    // A module we want pre-loaded into the snapshot
+    let module = Module::new(
+        "my_module.js",
+        "globalThis.importantFunction = function() {
+            return 42;
+        }",
+    );
+
+    let snapshot = SnapshotBuilder::new(Default::default())?
+        .with_module(&amp;module)?
+        .finish();
+
+    fs::write(SNAPSHOT_PATH, snapshot)?;
+    Ok(())
+}</code></pre></pre>
+<p>Then, in order to use the snapshot:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Runtime, RuntimeOptions};
+
+static SNAPSHOT: &amp;[u8] = include_bytes!("example_snapshot.bin");
+
+fn main() -&gt; Result&lt;(), rustyscript::Error&gt; {
+    let mut runtime = Runtime::new(RuntimeOptions {
+        startup_snapshot: Some(SNAPSHOT),
+        ..Default::default()
+    })?;
+    let important_value: u32 = runtime.eval("importantFunction()")?;
+    assert_eq!(important_value, 42);
+    Ok(())
+    }</code></pre></pre>
+<p>The startup time of the runtime will fall from ~50ms, to less than 1 with the snapshot.</p>
+<hr />
+<p>You could also generate the snapshot at runtime, in a lazy_static block, or similar:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime, RuntimeOptions, SnapshotBuilder};
+use std::sync::OnceLock;
+
+static SNAPSHOT: OnceLock&lt;Box&lt;[u8]&gt;&gt; = OnceLock::new();
+fn get_snapshot() -&gt; &amp;'static [u8] {
+    SNAPSHOT.get_or_init(|| {
+        let module = Module::new(
+            "my_module.js",
+            "globalThis.importantFunction = function() {
+            return 42;
+        }",
+        );
+
+        SnapshotBuilder::new(Default::default())
+            .unwrap()
+            .with_module(&amp;module)
+            .unwrap()
+            .finish()
+    })
+}
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let mut runtime = Runtime::new(RuntimeOptions {
+        startup_snapshot: Some(get_snapshot()),
+        ..Default::default()
+    })?;
+    runtime.eval::&lt;()&gt;("1 + 1")?;
+    Ok(())
+}
+</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="custom-extensions"><a class="header" href="#custom-extensions">Custom Extensions</a></h1>
+<p>TODO:</p>
+<ul>
+<li>op2</li>
+<li>extension!</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="asynchronous-javascript"><a class="header" href="#asynchronous-javascript">Asynchronous JavaScript</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="calling-rust-from-javascript"><a class="header" href="#calling-rust-from-javascript">Calling Rust from JavaScript</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="using-javascript-types-in-rust"><a class="header" href="#using-javascript-types-in-rust">Using JavaScript Types in Rust</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="nodejs-compatibility"><a class="header" href="#nodejs-compatibility">NodeJS Compatibility</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="multithreading"><a class="header" href="#multithreading">MultiThreading</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="permissions"><a class="header" href="#permissions">Permissions</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deno-extensions"><a class="header" href="#deno-extensions">Deno Extensions</a></h1>
+<p>The Deno JS runtime on which <code>Rustyscript</code> is based boasts very good compatibility with the complete JS standards.</p>
+<p>This is done through a series of extensions, listed below, which each provide a part of the full API.<br />
+This gives us the ability to use the full JS standard library, or just the parts we need.</p>
+<p>By default, <code>Rustyscript</code> includes only those extensions that maintain a secure, sandboxed runtime environment.</p>
+<blockquote>
+<p>See the <a href="extensions/safe_extensions.html">Safe Extensions</a> section for more information.</p>
+</blockquote>
+<hr />
+<p>Extensions can be activated using crate features, either individually or in groups:</p>
+<ul>
+<li><a href="extensions/safe_extensions.html"><code>safe_extensions</code></a> - On by default</li>
+<li><a href="extensions/io_extensions.html"><code>io_extensions</code></a> - For file system access</li>
+<li><a href="extensions/network_extensions.html"><code>network_extensions</code></a> - For network access</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deno-extensions-1"><a class="header" href="#deno-extensions-1">Deno Extensions</a></h1>
+<h2 id="safe-extensions"><a class="header" href="#safe-extensions">Safe Extensions</a></h2>
+<p>All the extensions mentioned below can be activated using the <code>safe_extensions</code> crate feature.</p>
+<p>By default, <code>Rustyscript</code> includes only those extensions that maintain a secure, sandboxed runtime environment.</p>
+<blockquote>
+<p><strong>Important Note</strong><br />
+By default the Javascript code you run have no access to system resources such as the file system, network, or environment variables.</p>
+</blockquote>
+<p>The safe extensions included by default are:</p>
+<ul>
+<li><a href="extensions/console.html"><code>console</code></a> - For logging</li>
+<li><a href="extensions/crypto.html"><code>crypto</code></a> - For cryptographic functions</li>
+<li><a href="extensions/url.html"><code>url</code></a> - For URL parsing</li>
+<li><a href="extensions/web_stub.html"><code>web_stub</code></a> - A stub for the <code>web</code> extension, providing timers, and base64 encoding/decoding</li>
+</ul>
+<p>The remaining extensions can be broadly categorized as either <code>io</code> or <code>network</code>.</p>
+<blockquote>
+<p><strong>Important Note</strong><br />
+With the exception of <a href="extensions/cron.html"><code>cron</code></a>, <a href="extensions/webstorage.html"><code>webstorage</code></a>, and <a href="extensions/ffi.html"><code>ffi</code></a><br />
+All the remaining extensions depend on the <a href="extensions/web.html"><code>web</code></a> extension.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="console"><a class="header" href="#console">Console</a></h1>
+<blockquote>
+<p>Crate features: [<code>console</code>, <code>safe_extensions</code>]<br />
+<a href="https://crates.io/crates/deno_console/">https://crates.io/crates/deno_console/</a><br />
+<a href="https://console.spec.whatwg.org/">https://console.spec.whatwg.org/</a></p>
+</blockquote>
+<p>Populates the global <code>console</code> object with methods for logging and debugging.</p>
+<p>This extensions is sandbox safe. It is enabled by default.</p>
+<h2 id="usage-example"><a class="header" href="#usage-example">Usage Example</a></h2>
+<pre><code class="language-js">console.log("Hello, world!");
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="crypto"><a class="header" href="#crypto">Crypto</a></h1>
+<blockquote>
+<p>Crate features: [<code>crypto</code>, <code>safe_extensions</code>]<br />
+<a href="https://crates.io/crates/deno_crypto/">https://crates.io/crates/deno_crypto/</a><br />
+<a href="https://www.w3.org/TR/WebCryptoAPI/">https://www.w3.org/TR/WebCryptoAPI/</a></p>
+</blockquote>
+<p>Populates the global <code>CryptoKey</code>, <code>Crypto</code>, <code>crypto</code>, and <code>SubtleCrypto</code> objects</p>
+<p>This extensions is sandbox safe. It is enabled by default.</p>
+<hr />
+<p>Usage Example:</p>
+<pre><code class="language-js">const key = await crypto.subtle.generateKey(
+  {
+    name: "AES-GCM",
+    length: 256,
+  },
+  true,
+  ["encrypt", "decrypt"],
+);
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="url"><a class="header" href="#url">Url</a></h1>
+<blockquote>
+<p>Crate features: [<code>url</code>, <code>safe_extensions</code>]<br />
+<a href="https://crates.io/crates/deno_url/">https://crates.io/crates/deno_url/</a><br />
+<a href="https://url.spec.whatwg.org/">https://url.spec.whatwg.org/</a>
+<a href="https://wicg.github.io/urlpattern/">https://wicg.github.io/urlpattern/</a></p>
+</blockquote>
+<p>Populates the global <code>URL</code>, <code>URLPattern</code>, <code>URLSearchParams</code> objects</p>
+<p>This extensions is sandbox safe. It is enabled by default.</p>
+<hr />
+<p>Usage Example:</p>
+<pre><code class="language-js">const url = new URL("https://example.com");
+const pattern = new URLPattern("https://example.com/*");
+const params = new URLSearchParams("a=1&amp;b=2");
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="web-stub"><a class="header" href="#web-stub">Web Stub</a></h1>
+<blockquote>
+<p>Crate features: [<code>web_stub</code>, <code>safe_extensions</code>]</p>
+</blockquote>
+<p>Mutually exclusive with the <code>web</code> extension.</p>
+<p>Enables the following:</p>
+<ul>
+<li>DOMException</li>
+<li>setImmediate</li>
+<li>clearInterval</li>
+<li>clearTimeout</li>
+<li>setInterval</li>
+<li>setTimeout</li>
+<li>atob</li>
+<li>btoa</li>
+</ul>
+<p>This extensions is sandbox safe. It is enabled by default.</p>
+<hr />
+<p>Usage Example:</p>
+<pre><code class="language-javascript">const base64 = btoa("Hello, world!");
+setImmediate(() =&gt; {
+  console.log(atob(base64));
+});
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deno-extensions-2"><a class="header" href="#deno-extensions-2">Deno Extensions</a></h1>
+<h2 id="io-extensions"><a class="header" href="#io-extensions">IO Extensions</a></h2>
+<p>All the extensions mentioned below can be activated using the <code>io_extensions</code> crate feature.</p>
+<p>These extensions grant runtimes access to the file system - but may also grant some level of network access - use caution.</p>
+<ul>
+<li><a href="extensions/fs.html"><code>fs</code></a> - For file system access</li>
+<li><a href="extensions/io.html"><code>io</code></a> - input/output primitives (stdio streams, etc)</li>
+<li><a href="extensions/cache.html"><code>cache</code></a> - Cache support, API reference <a href="https://w3c.github.io/ServiceWorker/#cache-interface">here</a></li>
+<li><a href="extensions/ffi.html"><code>ffi</code></a> - Deno FFI support</li>
+<li><a href="extensions/webgpu.html"><code>webgpu</code></a> - WebGPU support, API reference <a href="https://gpuweb.github.io/gpuweb/">here</a></li>
+<li><a href="extensions/kv.html"><code>kv</code></a> - Key-value store, API reference <a href="https://github.com/denoland/denokv/blob/main/proto/kv-connect.md">here</a></li>
+<li><a href="extensions/cron.html"><code>cron</code></a> - Implements scheduled tasks (crons) API</li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cache"><a class="header" href="#cache">Cache</a></h1>
+<blockquote>
+<p>Crate features: [<code>broadcast_channel</code>, <code>network_extensions</code>]
+<a href="https://crates.io/crates/deno_broadcast_channel/">https://crates.io/crates/deno_broadcast_channel/</a><br />
+<a href="https://html.spec.whatwg.org/multipage/web-messaging.html">https://html.spec.whatwg.org/multipage/web-messaging.html</a></p>
+</blockquote>
+<p>Populates the global <code>BroadcastChannel</code> object.</p>
+<p>Not sandbox safe. Off by default</p>
+<h2 id="options"><a class="header" href="#options">Options</a></h2>
+<p><strong><code>RuntimeOptions::extension_options::cache</code></strong></p>
+<ul>
+<li>The optional caching backend used by the extension.</li>
+<li>Default: <code>None</code></li>
+</ul>
+<p>To configure the cache, create an instance of the SQLite backend and pass it to the extension:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{
+    extensions::deno_cache::{CreateCache, SqliteBackedCache},
+    ExtensionOptions, RuntimeOptions,
+};
+use std::sync::Arc;
+
+fn main() {
+    let storage_dir = std::path::Path::new("deno_cache").to_path_buf();
+    let create_cache_fn = move || SqliteBackedCache::new(storage_dir.clone());
+    let cache = CreateCache(Arc::new(create_cache_fn));
+
+    let _options = RuntimeOptions {
+        extension_options: ExtensionOptions {
+            cache: Some(cache),
+            ..Default::default()
+        },
+        ..Default::default()
+    };
+}
+</code></pre></pre>
+<h2 id="usage-example-1"><a class="header" href="#usage-example-1">Usage Example</a></h2>
+<pre><code class="language-js">TODO
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="cron"><a class="header" href="#cron">Cron</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="ffi"><a class="header" href="#ffi">FFI</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="fs"><a class="header" href="#fs">FS</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="io"><a class="header" href="#io">IO</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="kv"><a class="header" href="#kv">KV</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="webgpu"><a class="header" href="#webgpu">WebGPU</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="deno-extensions-3"><a class="header" href="#deno-extensions-3">Deno Extensions</a></h1>
+<h2 id="network-extensions"><a class="header" href="#network-extensions">Network Extensions</a></h2>
+<p>All the extensions mentioned below can be activated using the <code>network_extensions</code> crate feature.</p>
+<p>These extensions grant runtimes access to system network resources</p>
+<ul>
+<li><a href="extensions/web.html"><code>web</code></a> - Timers, events, text encoder/decoder, See <a href="https://w3c.github.io/FileAPI">here</a> and <a href="https://fetch.spec.whatwg.org/">here</a></li>
+<li><a href="extensions/webstorage.html"><code>webstorage</code></a> - Web storage API, API reference <a href="https://html.spec.whatwg.org/multipage/webstorage.html">here</a></li>
+<li><a href="extensions/websocket.html"><code>websocket</code></a> - Websocket API, API reference <a href="https://websockets.spec.whatwg.org">here</a></li>
+<li><a href="extensions/http.html"><code>http</code></a> - Fetch primitives, API reference <a href="https://fetch.spec.whatwg.org/">here</a></li>
+<li><a href="extensions/broadcast_channel.html"><code>broadcast_channel</code></a> - Web messaging, API reference <a href="https://html.spec.whatwg.org/multipage/web-messaging.html">here</a></li>
+</ul>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="broadcast-channel"><a class="header" href="#broadcast-channel">Broadcast Channel</a></h1>
+<blockquote>
+<p>Crate features: [<code>broadcast_channel</code>, <code>network_extensions</code>]
+<a href="https://crates.io/crates/deno_broadcast_channel/">https://crates.io/crates/deno_broadcast_channel/</a><br />
+<a href="https://html.spec.whatwg.org/multipage/web-messaging.html">https://html.spec.whatwg.org/multipage/web-messaging.html</a></p>
+</blockquote>
+<p>Populates the global <code>BroadcastChannel</code> object.</p>
+<p>Not sandbox safe. Off by default</p>
+<h2 id="options-1"><a class="header" href="#options-1">Options</a></h2>
+<p><strong><code>RuntimeOptions::extension_options::broadcast_channel</code></strong></p>
+<ul>
+<li>The channel object used by the extension.</li>
+</ul>
+<h2 id="usage-example-2"><a class="header" href="#usage-example-2">Usage Example</a></h2>
+<pre><code class="language-js">const channel = new BroadcastChannel("my_channel");
+channel.onmessage = (event) =&gt; {
+  console.log(event.data);
+};
+channel.postMessage("Hello, world!");
+channel.close();
+</code></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="http"><a class="header" href="#http">HTTP</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="web"><a class="header" href="#web">Web</a></h1>
+<p>Mutually exclusive with the <code>web_stub</code> extension.</p>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="websocket"><a class="header" href="#websocket">WebSocket</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="webstorage"><a class="header" href="#webstorage">WebStorage</a></h1>
+
+                    </main>
+
+                    <nav class="nav-wrapper" aria-label="Page navigation">
+                        <!-- Mobile navigation buttons -->
+
+
+                        <div style="clear: both"></div>
+                    </nav>
+                </div>
+            </div>
+
+            <nav class="nav-wide-wrapper" aria-label="Page navigation">
+
+            </nav>
+
+        </div>
+
+        <!-- Livereload script (if served using the cli tool) -->
+        <script>
+            const wsProtocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsAddress = wsProtocol + "//" + location.host + "/" + "__livereload";
+            const socket = new WebSocket(wsAddress);
+            socket.onmessage = function (event) {
+                if (event.data === "reload") {
+                    socket.close();
+                    location.reload();
+                }
+            };
+
+            window.onbeforeunload = function() {
+                socket.close();
+            }
+        </script>
+
+
+
+        <script>
+            window.playground_copyable = true;
+        </script>
+
+
+        <script src="elasticlunr.min.js"></script>
+        <script src="mark.min.js"></script>
+        <script src="searcher.js"></script>
+
+        <script src="clipboard.min.js"></script>
+        <script src="highlight.js"></script>
+        <script src="book.js"></script>
+
+        <!-- Custom JS scripts -->
+
+        <script>
+        window.addEventListener('load', function() {
+            window.setTimeout(window.print, 100);
+        });
+        </script>
+
+    </div>
+    </body>
+</html>
