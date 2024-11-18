@@ -10,14 +10,14 @@
 -----
 
 - [Advanced Topics](advanced/README.md)
-    - [Snapshots](advanced/snapshots.md)
-    - [Custom Extensions](advanced/custom_extensions.md)
     - [Asynchronous JavaScript](advanced/asynchronous_javascript.md)
     - [Calling Rust from JavaScript](advanced/calling_rust_from_javascript.md)
     - [Using JavaScript Types in Rust](advanced/using_javascript_types_in_rust.md)
-    - [NodeJS Compatibility](advanced/nodejs_compatibility.md)
+    - [Custom Extensions](advanced/custom_extensions.md)
     - [Multi-Threading](advanced/multithreading.md)
+    - [NodeJS Compatibility](advanced/nodejs_compatibility.md)
     - [Permissions](advanced/permissions.md)
+    - [Snapshots](advanced/snapshots.md)
 
 -----
 

@@ -37,6 +37,4 @@ fn main() {
 ```
 
 ## Usage Example
-```js
 TODO
-```

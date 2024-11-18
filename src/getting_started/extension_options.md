@@ -7,9 +7,14 @@ The built-in deno extensions have additional options that can be configured when
 
 The fields it contains depend on the features enabled in the `rustyscript` crate. Here is a list of the fields and the features they depend on:
 
-- kv_store
-    - Depends on the [`kv`](../extensions/kv.md) feature
-    - Defines the key-value store to use for the `deno_kv` extension
+### kv_store
+> Depends on the [`kv`](../extensions/kv.md) feature
+Defines the key-value store to use for the `deno_kv` extension
+
+### broadcast_channel
+> Depends on the [`broadcast_channel`](../extensions/broadcast_channel.md) feature
+Defines the in-memory broadcast channel to use for the `deno_broadcast_channel` extension
+
 - broadcast_channel
     - Depends on the [`broadcast_channel`](../extensions/broadcast_channel.md) feature
     - Defines the in-memory broadcast channel to use for the `deno_broadcast_channel` extension

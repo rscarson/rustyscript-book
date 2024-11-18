@@ -5490,6 +5490,7 @@ dependencies = [
 [[package]]
 name = "rustyscript"
 version = "0.10.0"
+source = "git+https://github.com/rscarson/rustyscript.git#111bf752c901bac9aded309cbf7fc3b2dac6fc99"
 dependencies = [
  "async-trait",
  "base64-simd 0.8.0",
