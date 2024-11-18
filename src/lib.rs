@@ -38,6 +38,7 @@ mod test {
         }
     }
 
+    #[test]
     fn test_js() {
         // Get all the files in the js_examples directory
         let mut targets = vec![];
@@ -60,10 +61,12 @@ mod test {
         }
 
         if !errors.is_empty() {
-            println!("Errors:");
+            eprintln!("Errors:");
             for err in errors {
-                println!("{}", err);
+                eprintln!("{}", err);
             }
+
+            panic!("Some examples failed");
         }
     }
 }
