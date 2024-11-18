@@ -144,7 +144,40 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="multithreading"><a class="header" href="#multithreading">MultiThreading</a></h1>
-<p>Coming Soon</p>
+<p>rustyscript is not thread-safe, due to limitations of the underlying engine, deno_core</p>
+<p>The <code>worker</code> feature (enabled by default) gets around this by defining worker threads, which can be used in parallel.<br />
+Workers use queries sent over channels to communicate with the main thread.</p>
+<p><a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.DefaultWorker.html"><code>DefaultWorker</code></a> is a very simple built-in worker implementation:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{worker::{DefaultWorker, DefaultWorkerQuery}, Error, Module};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let worker = DefaultWorker::new(Default::default())?;
+
+    // Instruct the worker to load a module
+    let module = Module::new(&quot;test.js&quot;, &quot;export function add(a, b) { return a + b; }&quot;);
+    let query = DefaultWorkerQuery::LoadMainModule(module);
+    worker.send(query)?;
+
+    // This module ID will be used to refer to the module in future queries
+    let module_id = worker.receive()?;
+
+    // Now we can call the function
+    let query = DefaultWorkerQuery::CallFunction(Some(module_id), &quot;add&quot;.to_string(), vec![1.into(), 2.into()]);
+    let response = worker.send_and_await(query)?;
+    if let DefaultWorkerQuery::Value(v) = response {
+        assert_eq!(v, 3.into());
+    }
+}
+</code></pre></pre>
+<blockquote>
+<p>Note that the worker has built-in helpers for many operations - this example could be far more succinct, as seen <a href="https://github.com/rscarson/rustyscript/blob/master/examples/default_threaded_worker.rs">here</a>.</p>
+</blockquote>
+<p>However, for many applications this will, of course, not be sufficient, in which case you can implement your own worker - <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_threaded_worker.rs">See this example</a></p>
+<hr />
+<p>The worker module also provides <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html"><code>WorkerPool</code></a>, which can be used to manage multiple workers.</p>
+<ul>
+<li>See <a href="https://github.com/rscarson/rustyscript/blob/master/examples/worker_pool.rs">this example</a></li>
+</ul>
 
                     </main>
 

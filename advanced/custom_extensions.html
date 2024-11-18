@@ -144,11 +144,124 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="custom-extensions"><a class="header" href="#custom-extensions">Custom Extensions</a></h1>
-<p>TODO:</p>
+<blockquote>
+<p>Note that the examples in this chapter require your crate to supply the <strong>same version</strong> of <a href="https://crates.io/crates/deno_core"><code>deno_core</code></a> as rustyscript uses - this version can be checked <a href="https://crates.io/crates/rustyscript/latest/dependencies">here</a></p>
+</blockquote>
+<p>The most performant way to extend rustyscript is to use the <code>extension</code> feature of deno_core.</p>
+<p>The following example demonstrates how to create a simple extension that adds two numbers together.</p>
+<blockquote>
+<p><strong>Important note:</strong> All javascript files included in an extension MUST be included somewhere.
+I recommend using the file specified in <code>esm_entry_point</code> to include all other files.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime, RuntimeOptions};
+use deno_core::{extension, op2};
+
+#[op2(fast)]
+#[bigint]
+fn op_add_example(#[bigint] a: i64, #[bigint] b: i64) -&gt; i64 {
+    a + b
+}
+
+extension!(
+    example_extension,                                  // The name of the extension
+    ops = [op_add_example],                             // The ops to include in the extension
+    esm_entry_point = &quot;simple_extension.js&quot;,            // The entry point for the extension
+    esm = [ dir &quot;js_examples&quot;, &quot;simple_extension.js&quot; ], // The javascript files to include
+);
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    // If you were loading from a snapshot, you would use init_ops instead of init_ops_and_esm
+    // let my_extension = example_extension::init_ops();
+    let my_extension = example_extension::init_ops_and_esm();
+
+    let mut runtime = Runtime::new(RuntimeOptions {
+        extensions: vec![my_extension],
+        ..Default::default()
+    })?;
+
+    let result: i64 = runtime.eval(&quot;my_add(5, 5)&quot;)?;
+    assert_eq!(10, result);
+
+    Ok(())
+}
+</code></pre></pre>
+<p>And the corresponding javascript file:</p>
+<pre><code class="language-javascript norun">export const add = (a, b) =&gt; Deno.core.ops.op_add_example(a, b);
+globalThis.my_add = add;
+</code></pre>
+<h2 id="op2"><a class="header" href="#op2">Op2</a></h2>
+<p><code>Op2</code> is a deno-provided macro that allows you to define an extension function.</p>
 <ul>
-<li>op2</li>
-<li>extension!</li>
+<li>The supported types for arguments can be found listed in <a href="https://github.com/denoland/deno_core/blob/main/ops/op2/valid_args.md">https://github.com/denoland/deno_core/blob/main/ops/op2/valid_args.md</a></li>
+<li>And return types, here: <a href="https://github.com/denoland/deno_core/blob/main/ops/op2/valid_retvals.md">https://github.com/denoland/deno_core/blob/main/ops/op2/valid_retvals.md</a></li>
 </ul>
+<p>The <code>fast</code> attribute used when possible to denote that the types involved can be converted fast. Don't stress too much on when to use this, as the compiler will tell you if you need it, or do not.</p>
+<hr />
+<p>Async functions can be defined as well. </p>
+<p>Let us break down a more complex example taken from rustyscript's own internals:</p>
+<pre><pre class="playground"><code class="language-rust norun">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[op2(async)]
+#[serde]
+fn call_registered_function_async(
+    #[string] name: String,
+    #[serde] args: Vec&lt;serde_json::Value&gt;,
+    state: &amp;mut OpState,
+) -&gt; impl std::future::Future&lt;Output = Result&lt;serde_json::Value, Error&gt;&gt; {
+    if state.has::&lt;AsyncFnCache&gt;() {
+        let table = state.borrow_mut::&lt;AsyncFnCache&gt;();
+        if let Some(callback) = table.get(&amp;name) {
+            return callback(args);
+        }
+    }
+
+    Box::pin(std::future::ready(Err(Error::ValueNotCallable(name))))
+}
+<span class="boring">}
+</span></code></pre></pre>
+<ul>
+<li><code>#[op2(async)]</code> is used to denote that this is an async function - it must return a <code>Future</code> of some kind 
+<ul>
+<li>Potential pitfall: <strong>the returned future cannot have a lifetime</strong></li>
+</ul>
+</li>
+<li><code>#[serde]</code> means that the return value will be a type decoded with <code>serde::Deserialize</code>.
+<ul>
+<li>In this fase, there return value is <code>Future&lt;Output = Result&lt;serde_json::Value, Error&gt;&gt;</code> - A future that resolves to a <code>serde_json::Value</code>, or an error.</li>
+</ul>
+</li>
+<li>The arguments are annotated with <code>#[string]</code> and <code>#[serde]</code> to denote that they are a string, and a deserializable type, respectively.
+<ul>
+<li>The <code>state</code> argument is a special case that can be used for persistent storage inside of ops. In this case, it is used to store a cache.</li>
+</ul>
+</li>
+</ul>
+<p>And finally, the returned future is run through <code>Box::pin</code> before being returned.</p>
+<hr />
+<p>You can also customize the names of your extension modules<br />
+If you instead define the extension as follows:</p>
+<pre><pre class="playground"><code class="language-rust norun">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>extension!(
+    example_extension,
+    ops = [op_add_example],
+    esm_entry_point = &quot;example:calculator&quot;,
+    esm = [ dir &quot;examples/example_extension&quot;, &quot;example:calculator&quot; = &quot;example_extension.js&quot; ],
+);
+<span class="boring">}
+</span></code></pre></pre>
+<p>Then provide a schema whitelist in your <code>RuntimeOptions</code>:</p>
+<pre><pre class="playground"><code class="language-rust norun">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>    let mut schema_whlist = HashSet::new();
+    schema_whlist.insert(&quot;example:&quot;.to_string());
+    options.schema_whlist = schema_whlist;
+<span class="boring">}
+</span></code></pre></pre>
+<p>You would be able to <code>import { add } from &quot;example:calculator&quot;;</code> from inside of your js modules.</p>
 
                     </main>
 

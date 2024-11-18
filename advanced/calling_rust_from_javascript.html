@@ -144,7 +144,66 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="calling-rust-from-javascript"><a class="header" href="#calling-rust-from-javascript">Calling Rust from JavaScript</a></h1>
-<p>Coming Soon</p>
+<p>rustyscript supports registering rust functions to be callable from JavaScript. </p>
+<blockquote>
+<p>A more advanced and performant way to call rust from JS is through <a href="./custom_extensions.html">custom extensions</a>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    // Let's get a new runtime first
+    let mut runtime = Runtime::new(Default::default())?;
+
+    // We can use a normal function, if we wish
+    // It can also be `move` if we want to capture some state
+    runtime.register_function(&quot;echo&quot;, |args| {
+        // Decode the input
+        let input = args
+            .first()
+            .ok_or(Error::Runtime(&quot;No input&quot;.to_string()))
+            .map(|v| serde_json::from_value::&lt;String&gt;(v.clone()))??;
+
+        // Encode the output
+        let output = format!(&quot;Hello, {input}!&quot;);
+        Ok::&lt;_, Error&gt;(serde_json::Value::String(output))
+    })?;
+
+    // There is also a helper macro to create a callback
+    // It will take care of deserializing arguments and serializing the result
+    runtime.register_function(
+        &quot;add&quot;,
+        sync_callback!(|a: i64, b: i64| {
+            a.checked_add(b)
+                .ok_or(Error::Runtime(&quot;Overflow&quot;.to_string()))
+        }),
+    )?;
+
+    // The registered functions can now be called from JavaScript
+    runtime.eval::&lt;()&gt;(&quot;rustyscript.functions.echo('test')&quot;)?;
+
+    Ok(())
+}
+</code></pre></pre>
+<p>Async functions can be defined as well:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let mut runtime = Runtime::new(Default::default())?;
+
+    // There is also an async version
+    runtime.register_async_function(
+        &quot;asyncEcho&quot;,
+        async_callback!(|input: String| {
+            async move { Ok::&lt;_, Error&gt;(format!(&quot;Hello, {input}!&quot;)) }
+        }),
+    )?;
+
+    // The registered functions can now be called from JavaScript
+    runtime.eval::&lt;()&gt;(&quot;rustyscript.async_functions.asyncEcho('test')&quot;)?;
+
+    Ok(())
+}
+</code></pre></pre>
 
                     </main>
 

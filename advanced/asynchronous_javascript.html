@@ -144,7 +144,98 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="asynchronous-javascript"><a class="header" href="#asynchronous-javascript">Asynchronous JavaScript</a></h1>
-<p>Coming Soon</p>
+<p>By default, rustyscript can resolve most asynchronous javascript, including promises, by blocking the current thread.<br />
+In many cases, however, this will not be sufficient.</p>
+<p>To this end, many functions will have <code>_async</code> and <code>_immediate</code> variants.</p>
+<ul>
+<li><code>_async</code> functions will return a <code>Future</code> that that resolves when:
+<ul>
+<li>The event loop is resolved, and</li>
+<li>If the value is a promise, the promise is resolved</li>
+</ul>
+</li>
+<li><code>_immediate</code> functions will return a value immediately, but will not resolve promises or advance the event loop.
+<ul>
+<li>Promises can be returned by specifying the return type as <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html"><code>js_value::Promise</code></a></li>
+<li>The event loop should be run using [<code>Runtime::await_event_loop</code>]</li>
+</ul>
+</li>
+</ul>
+<p>A long-form example can be found <a href="https://github.com/rscarson/rustyscript/blob/master/examples/async_javascript.rs">here</a></p>
+<h2 id="futures-with-async-functions"><a class="header" href="#futures-with-async-functions">Futures, with async functions</a></h2>
+<p>In the example below, we define a simple async function in javascript, and call it from rust.<br />
+The runtime's own tokio runtime is used to resolve the future.</p>
+<p>The event loop, and the implicit promise resolution, is handled by the runtime, transparently.<br />
+This is the simplest way to use async functions.</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{js_value::Promise, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let module = Module::new(
+        &quot;test.js&quot;,
+        &quot;
+        export const my_func = async () =&gt; 42;
+    &quot;,
+    );
+
+    // Create a new runtime
+    // We don't need to create a tokio runtime, as the runtime will create one for us
+    let mut runtime = Runtime::new(Default::default())?;
+    let handle = runtime.load_module(&amp;module)?;
+    let tokio_runtime = runtime.tokio_runtime();
+
+    // Call the function, and await the result
+    tokio_runtime.block_on(async {
+        let value: u32 = runtime.call_function_async(Some(&amp;handle), &quot;my_func&quot;, &amp;()).await?;
+        assert_eq!(value, 42);
+    })?;
+
+    Ok(())
+}
+</code></pre></pre>
+<p>Another way is with <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html"><code>js_value::Promise</code></a></p>
+<p>Normally, calling a function would resolve the promise. So we need to use <code>call_function_immediate</code> instead.</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{js_value::Promise, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let module = Module::new(
+        &quot;test.js&quot;,
+        &quot;
+        export const my_func = async () =&gt; 42;
+    &quot;,
+    );
+
+    // Create a new runtime
+    let mut runtime = Runtime::new(Default::default())?;
+    let handle = runtime.load_module(&amp;module)?;
+
+    // Call the function, and get the promise
+    let promise: Promise&lt;u32&gt; = runtime.call_function_immediate(Some(&amp;handle), &quot;my_func&quot;, &amp;())?;
+
+    // Resolve the promise
+    // You could instead call `into_future` here, and await it, for a non-blocking version
+    let value = promise.into_value()?;
+    assert_eq!(value, 42);
+
+    Ok(())
+}
+</code></pre></pre>
+<h2 id="background-tasks"><a class="header" href="#background-tasks">Background Tasks</a></h2>
+<p>Sometimes, a module may begin background tasks, which would tie up the event loop for a long time, causing the <code>async</code> and <code>blocking</code> functions to hang.</p>
+<p>In this case, you can use one of the following methods:</p>
+<ul>
+<li><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.await_event_loop">Runtime::await_event_loop</a></li>
+<li><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.block_on_event_loop">Runtime::block_on_event_loop</a></li>
+<li><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.advance_event_loop">Runtime::advance_event_loop</a></li>
+</ul>
+<p>Combined with the <code>immediate</code> variants of most functions, this will allow you full control over execution of the event loop.</p>
+<blockquote>
+<p>See <a href="https://github.com/rscarson/rustyscript/blob/master/examples/background_tasks.rs">this example</a> for a demonstration.</p>
+</blockquote>
+<h2 id="threading"><a class="header" href="#threading">Threading</a></h2>
+<p>The last way to handle async functions is to use a separate thread.</p>
+<blockquote>
+<p>See <a href="../advanced/multithreading.html">Multi-Threading</a> for more information.</p>
+</blockquote>
 
                     </main>
 

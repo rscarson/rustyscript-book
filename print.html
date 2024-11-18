@@ -496,17 +496,313 @@ Or simply use <code>()</code>:</p>
 <li><a href="advanced/snapshots.html">Using snapshots to increase startup time</a></li>
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="asynchronous-javascript"><a class="header" href="#asynchronous-javascript">Asynchronous JavaScript</a></h1>
-<p>Coming Soon</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="calling-rust-from-javascript"><a class="header" href="#calling-rust-from-javascript">Calling Rust from JavaScript</a></h1>
-<p>Coming Soon</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="custom-extensions"><a class="header" href="#custom-extensions">Custom Extensions</a></h1>
-<p>TODO:</p>
+<p>By default, rustyscript can resolve most asynchronous javascript, including promises, by blocking the current thread.<br />
+In many cases, however, this will not be sufficient.</p>
+<p>To this end, many functions will have <code>_async</code> and <code>_immediate</code> variants.</p>
 <ul>
-<li>op2</li>
-<li>extension!</li>
+<li><code>_async</code> functions will return a <code>Future</code> that that resolves when:
+<ul>
+<li>The event loop is resolved, and</li>
+<li>If the value is a promise, the promise is resolved</li>
 </ul>
+</li>
+<li><code>_immediate</code> functions will return a value immediately, but will not resolve promises or advance the event loop.
+<ul>
+<li>Promises can be returned by specifying the return type as <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html"><code>js_value::Promise</code></a></li>
+<li>The event loop should be run using [<code>Runtime::await_event_loop</code>]</li>
+</ul>
+</li>
+</ul>
+<p>A long-form example can be found <a href="https://github.com/rscarson/rustyscript/blob/master/examples/async_javascript.rs">here</a></p>
+<h2 id="futures-with-async-functions"><a class="header" href="#futures-with-async-functions">Futures, with async functions</a></h2>
+<p>In the example below, we define a simple async function in javascript, and call it from rust.<br />
+The runtime's own tokio runtime is used to resolve the future.</p>
+<p>The event loop, and the implicit promise resolution, is handled by the runtime, transparently.<br />
+This is the simplest way to use async functions.</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{js_value::Promise, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let module = Module::new(
+        &quot;test.js&quot;,
+        &quot;
+        export const my_func = async () =&gt; 42;
+    &quot;,
+    );
+
+    // Create a new runtime
+    // We don't need to create a tokio runtime, as the runtime will create one for us
+    let mut runtime = Runtime::new(Default::default())?;
+    let handle = runtime.load_module(&amp;module)?;
+    let tokio_runtime = runtime.tokio_runtime();
+
+    // Call the function, and await the result
+    tokio_runtime.block_on(async {
+        let value: u32 = runtime.call_function_async(Some(&amp;handle), &quot;my_func&quot;, &amp;()).await?;
+        assert_eq!(value, 42);
+    })?;
+
+    Ok(())
+}
+</code></pre></pre>
+<p>Another way is with <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html"><code>js_value::Promise</code></a></p>
+<p>Normally, calling a function would resolve the promise. So we need to use <code>call_function_immediate</code> instead.</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{js_value::Promise, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let module = Module::new(
+        &quot;test.js&quot;,
+        &quot;
+        export const my_func = async () =&gt; 42;
+    &quot;,
+    );
+
+    // Create a new runtime
+    let mut runtime = Runtime::new(Default::default())?;
+    let handle = runtime.load_module(&amp;module)?;
+
+    // Call the function, and get the promise
+    let promise: Promise&lt;u32&gt; = runtime.call_function_immediate(Some(&amp;handle), &quot;my_func&quot;, &amp;())?;
+
+    // Resolve the promise
+    // You could instead call `into_future` here, and await it, for a non-blocking version
+    let value = promise.into_value()?;
+    assert_eq!(value, 42);
+
+    Ok(())
+}
+</code></pre></pre>
+<h2 id="background-tasks"><a class="header" href="#background-tasks">Background Tasks</a></h2>
+<p>Sometimes, a module may begin background tasks, which would tie up the event loop for a long time, causing the <code>async</code> and <code>blocking</code> functions to hang.</p>
+<p>In this case, you can use one of the following methods:</p>
+<ul>
+<li><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.await_event_loop">Runtime::await_event_loop</a></li>
+<li><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.block_on_event_loop">Runtime::block_on_event_loop</a></li>
+<li><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.advance_event_loop">Runtime::advance_event_loop</a></li>
+</ul>
+<p>Combined with the <code>immediate</code> variants of most functions, this will allow you full control over execution of the event loop.</p>
+<blockquote>
+<p>See <a href="https://github.com/rscarson/rustyscript/blob/master/examples/background_tasks.rs">this example</a> for a demonstration.</p>
+</blockquote>
+<h2 id="threading"><a class="header" href="#threading">Threading</a></h2>
+<p>The last way to handle async functions is to use a separate thread.</p>
+<blockquote>
+<p>See <a href="advanced/../advanced/multithreading.html">Multi-Threading</a> for more information.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="calling-rust-from-javascript"><a class="header" href="#calling-rust-from-javascript">Calling Rust from JavaScript</a></h1>
+<p>rustyscript supports registering rust functions to be callable from JavaScript. </p>
+<blockquote>
+<p>A more advanced and performant way to call rust from JS is through <a href="advanced/./custom_extensions.html">custom extensions</a>.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    // Let's get a new runtime first
+    let mut runtime = Runtime::new(Default::default())?;
+
+    // We can use a normal function, if we wish
+    // It can also be `move` if we want to capture some state
+    runtime.register_function(&quot;echo&quot;, |args| {
+        // Decode the input
+        let input = args
+            .first()
+            .ok_or(Error::Runtime(&quot;No input&quot;.to_string()))
+            .map(|v| serde_json::from_value::&lt;String&gt;(v.clone()))??;
+
+        // Encode the output
+        let output = format!(&quot;Hello, {input}!&quot;);
+        Ok::&lt;_, Error&gt;(serde_json::Value::String(output))
+    })?;
+
+    // There is also a helper macro to create a callback
+    // It will take care of deserializing arguments and serializing the result
+    runtime.register_function(
+        &quot;add&quot;,
+        sync_callback!(|a: i64, b: i64| {
+            a.checked_add(b)
+                .ok_or(Error::Runtime(&quot;Overflow&quot;.to_string()))
+        }),
+    )?;
+
+    // The registered functions can now be called from JavaScript
+    runtime.eval::&lt;()&gt;(&quot;rustyscript.functions.echo('test')&quot;)?;
+
+    Ok(())
+}
+</code></pre></pre>
+<p>Async functions can be defined as well:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let mut runtime = Runtime::new(Default::default())?;
+
+    // There is also an async version
+    runtime.register_async_function(
+        &quot;asyncEcho&quot;,
+        async_callback!(|input: String| {
+            async move { Ok::&lt;_, Error&gt;(format!(&quot;Hello, {input}!&quot;)) }
+        }),
+    )?;
+
+    // The registered functions can now be called from JavaScript
+    runtime.eval::&lt;()&gt;(&quot;rustyscript.async_functions.asyncEcho('test')&quot;)?;
+
+    Ok(())
+}
+</code></pre></pre>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="custom-extensions"><a class="header" href="#custom-extensions">Custom Extensions</a></h1>
+<blockquote>
+<p>Note that the examples in this chapter require your crate to supply the <strong>same version</strong> of <a href="https://crates.io/crates/deno_core"><code>deno_core</code></a> as rustyscript uses - this version can be checked <a href="https://crates.io/crates/rustyscript/latest/dependencies">here</a></p>
+</blockquote>
+<p>The most performant way to extend rustyscript is to use the <code>extension</code> feature of deno_core.</p>
+<p>The following example demonstrates how to create a simple extension that adds two numbers together.</p>
+<blockquote>
+<p><strong>Important note:</strong> All javascript files included in an extension MUST be included somewhere.
+I recommend using the file specified in <code>esm_entry_point</code> to include all other files.</p>
+</blockquote>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime, RuntimeOptions};
+use deno_core::{extension, op2};
+
+#[op2(fast)]
+#[bigint]
+fn op_add_example(#[bigint] a: i64, #[bigint] b: i64) -&gt; i64 {
+    a + b
+}
+
+extension!(
+    example_extension,                                  // The name of the extension
+    ops = [op_add_example],                             // The ops to include in the extension
+    esm_entry_point = &quot;simple_extension.js&quot;,            // The entry point for the extension
+    esm = [ dir &quot;js_examples&quot;, &quot;simple_extension.js&quot; ], // The javascript files to include
+);
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    // If you were loading from a snapshot, you would use init_ops instead of init_ops_and_esm
+    // let my_extension = example_extension::init_ops();
+    let my_extension = example_extension::init_ops_and_esm();
+
+    let mut runtime = Runtime::new(RuntimeOptions {
+        extensions: vec![my_extension],
+        ..Default::default()
+    })?;
+
+    let result: i64 = runtime.eval(&quot;my_add(5, 5)&quot;)?;
+    assert_eq!(10, result);
+
+    Ok(())
+}
+</code></pre></pre>
+<p>And the corresponding javascript file:</p>
+<pre><code class="language-javascript norun">export const add = (a, b) =&gt; Deno.core.ops.op_add_example(a, b);
+globalThis.my_add = add;
+</code></pre>
+<h2 id="op2"><a class="header" href="#op2">Op2</a></h2>
+<p><code>Op2</code> is a deno-provided macro that allows you to define an extension function.</p>
+<ul>
+<li>The supported types for arguments can be found listed in <a href="https://github.com/denoland/deno_core/blob/main/ops/op2/valid_args.md">https://github.com/denoland/deno_core/blob/main/ops/op2/valid_args.md</a></li>
+<li>And return types, here: <a href="https://github.com/denoland/deno_core/blob/main/ops/op2/valid_retvals.md">https://github.com/denoland/deno_core/blob/main/ops/op2/valid_retvals.md</a></li>
+</ul>
+<p>The <code>fast</code> attribute used when possible to denote that the types involved can be converted fast. Don't stress too much on when to use this, as the compiler will tell you if you need it, or do not.</p>
+<hr />
+<p>Async functions can be defined as well. </p>
+<p>Let us break down a more complex example taken from rustyscript's own internals:</p>
+<pre><pre class="playground"><code class="language-rust norun">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>#[op2(async)]
+#[serde]
+fn call_registered_function_async(
+    #[string] name: String,
+    #[serde] args: Vec&lt;serde_json::Value&gt;,
+    state: &amp;mut OpState,
+) -&gt; impl std::future::Future&lt;Output = Result&lt;serde_json::Value, Error&gt;&gt; {
+    if state.has::&lt;AsyncFnCache&gt;() {
+        let table = state.borrow_mut::&lt;AsyncFnCache&gt;();
+        if let Some(callback) = table.get(&amp;name) {
+            return callback(args);
+        }
+    }
+
+    Box::pin(std::future::ready(Err(Error::ValueNotCallable(name))))
+}
+<span class="boring">}
+</span></code></pre></pre>
+<ul>
+<li><code>#[op2(async)]</code> is used to denote that this is an async function - it must return a <code>Future</code> of some kind 
+<ul>
+<li>Potential pitfall: <strong>the returned future cannot have a lifetime</strong></li>
+</ul>
+</li>
+<li><code>#[serde]</code> means that the return value will be a type decoded with <code>serde::Deserialize</code>.
+<ul>
+<li>In this fase, there return value is <code>Future&lt;Output = Result&lt;serde_json::Value, Error&gt;&gt;</code> - A future that resolves to a <code>serde_json::Value</code>, or an error.</li>
+</ul>
+</li>
+<li>The arguments are annotated with <code>#[string]</code> and <code>#[serde]</code> to denote that they are a string, and a deserializable type, respectively.
+<ul>
+<li>The <code>state</code> argument is a special case that can be used for persistent storage inside of ops. In this case, it is used to store a cache.</li>
+</ul>
+</li>
+</ul>
+<p>And finally, the returned future is run through <code>Box::pin</code> before being returned.</p>
+<hr />
+<p>You can also customize the names of your extension modules<br />
+If you instead define the extension as follows:</p>
+<pre><pre class="playground"><code class="language-rust norun">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>extension!(
+    example_extension,
+    ops = [op_add_example],
+    esm_entry_point = &quot;example:calculator&quot;,
+    esm = [ dir &quot;examples/example_extension&quot;, &quot;example:calculator&quot; = &quot;example_extension.js&quot; ],
+);
+<span class="boring">}
+</span></code></pre></pre>
+<p>Then provide a schema whitelist in your <code>RuntimeOptions</code>:</p>
+<pre><pre class="playground"><code class="language-rust norun">
+<span class="boring">#![allow(unused)]
+</span><span class="boring">fn main() {
+</span>    let mut schema_whlist = HashSet::new();
+    schema_whlist.insert(&quot;example:&quot;.to_string());
+    options.schema_whlist = schema_whlist;
+<span class="boring">}
+</span></code></pre></pre>
+<p>You would be able to <code>import { add } from &quot;example:calculator&quot;;</code> from inside of your js modules.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="multithreading"><a class="header" href="#multithreading">MultiThreading</a></h1>
-<p>Coming Soon</p>
+<p>rustyscript is not thread-safe, due to limitations of the underlying engine, deno_core</p>
+<p>The <code>worker</code> feature (enabled by default) gets around this by defining worker threads, which can be used in parallel.<br />
+Workers use queries sent over channels to communicate with the main thread.</p>
+<p><a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.DefaultWorker.html"><code>DefaultWorker</code></a> is a very simple built-in worker implementation:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{worker::{DefaultWorker, DefaultWorkerQuery}, Error, Module};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let worker = DefaultWorker::new(Default::default())?;
+
+    // Instruct the worker to load a module
+    let module = Module::new(&quot;test.js&quot;, &quot;export function add(a, b) { return a + b; }&quot;);
+    let query = DefaultWorkerQuery::LoadMainModule(module);
+    worker.send(query)?;
+
+    // This module ID will be used to refer to the module in future queries
+    let module_id = worker.receive()?;
+
+    // Now we can call the function
+    let query = DefaultWorkerQuery::CallFunction(Some(module_id), &quot;add&quot;.to_string(), vec![1.into(), 2.into()]);
+    let response = worker.send_and_await(query)?;
+    if let DefaultWorkerQuery::Value(v) = response {
+        assert_eq!(v, 3.into());
+    }
+}
+</code></pre></pre>
+<blockquote>
+<p>Note that the worker has built-in helpers for many operations - this example could be far more succinct, as seen <a href="https://github.com/rscarson/rustyscript/blob/master/examples/default_threaded_worker.rs">here</a>.</p>
+</blockquote>
+<p>However, for many applications this will, of course, not be sufficient, in which case you can implement your own worker - <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_threaded_worker.rs">See this example</a></p>
+<hr />
+<p>The worker module also provides <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html"><code>WorkerPool</code></a>, which can be used to manage multiple workers.</p>
+<ul>
+<li>See <a href="https://github.com/rscarson/rustyscript/blob/master/examples/worker_pool.rs">this example</a></li>
+</ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="nodejs-compatibility"><a class="header" href="#nodejs-compatibility">NodeJS Compatibility</a></h1>
 <p>With the <code>node_experimental</code> crate-level feature, you can enable support for some NodeJS APIs. It will also enable all other extension features.</p>
 <blockquote>
@@ -532,27 +828,28 @@ This allows for a more fine-grained control over what can be accessed.</p>
 <p>This can be done by specifying a value for the <code>permissions: Arc&lt;dyn WebPermissions&gt;,</code> field in <code>RuntimeOptions::web</code>.</p>
 <p>The default value is <code>DefaultWebPermissions</code>, which simply allows everything.</p>
 <p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissionsSet.html"><code>AllowlistWebPermissionsSet</code></a> is also built-in, and allows for specific permissions to be turned on or off:</p>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{AllowlistWebPermissionsSet, Runtime, RuntimeOptions, WebOptions, Error};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{AllowlistWebPermissions, Error, Runtime, RuntimeOptions};
+use std::sync::Arc;
 
 fn main() -&gt; Result&lt;(), Error&gt; {
-    let permissions = Arc::new(AllowlistWebPermissionsSet::default());
-    let runtime = Runtime::new(RuntimeOptions {
-        web: Some(WebOptions {
-            permissions,
-            ..Default::default()
-        }),
-        ..Default::default()
-    })?;
+    let permissions = Arc::new(AllowlistWebPermissions::default());
+    let mut options = RuntimeOptions::default();
+    options.extension_options.web.permissions = permissions.clone();
+
+    let mut runtime = Runtime::new(options)?;
 
     // Fetching any URL will fail
-    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;)?;
+    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;);
     assert!(result.is_err());
 
     // But if we allow it:
     permissions.allow_url(&quot;https://example.com&quot;);
-    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;)?;
+    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;);
     assert!(result.is_ok());
+
+    Ok(())
 }
+
 </code></pre></pre>
 <blockquote>
 <p>You can also implement the <a href="https://docs.rs/rustyscript/latest/rustyscript/trait.WebPermissions.html"><code>WebPermissions</code></a> trait yourself, and use that instead for even more precise control.</p>
