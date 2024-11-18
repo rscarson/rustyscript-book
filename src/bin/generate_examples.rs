@@ -31,6 +31,10 @@ fn extract_examples() -> Result<Vec<(PathBuf, String)>, anyhow::Error> {
     // Generate the examples
     let mut examples = Vec::new();
     for block in code_blocks {
+        if block.metadata.contains(&"norun".to_string()) {
+            continue;
+        }
+
         let filename = format!(
             "auto_{}_line_{}.{}",
             block.location.file.replace(['/', '\\', '.'], "_"),
