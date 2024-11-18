@@ -144,7 +144,36 @@
                 <div id="content" class="content">
                     <main>
                         <h1 id="permissions"><a class="header" href="#permissions">Permissions</a></h1>
-<p>Coming Soon</p>
+<p>Many of the extension features allow for custom permissions to be set.<br />
+This allows for a more fine-grained control over what can be accessed.</p>
+<p>This can be done by specifying a value for the <code>permissions: Arc&lt;dyn WebPermissions&gt;,</code> field in <code>RuntimeOptions::web</code>.</p>
+<p>The default value is <code>DefaultWebPermissions</code>, which simply allows everything.</p>
+<p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissionsSet.html"><code>AllowlistWebPermissionsSet</code></a> is also built-in, and allows for specific permissions to be turned on or off:</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{AllowlistWebPermissionsSet, Runtime, RuntimeOptions, WebOptions, Error};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let permissions = Arc::new(AllowlistWebPermissionsSet::default());
+    let runtime = Runtime::new(RuntimeOptions {
+        web: Some(WebOptions {
+            permissions,
+            ..Default::default()
+        }),
+        ..Default::default()
+    })?;
+
+    // Fetching any URL will fail
+    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;)?;
+    assert!(result.is_err());
+
+    // But if we allow it:
+    permissions.allow_url(&quot;https://example.com&quot;);
+    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;)?;
+    assert!(result.is_ok());
+}
+</code></pre></pre>
+<blockquote>
+<p>You can also implement the <a href="https://docs.rs/rustyscript/latest/rustyscript/trait.WebPermissions.html"><code>WebPermissions</code></a> trait yourself, and use that instead for even more precise control.</p>
+</blockquote>
 
                     </main>
 
