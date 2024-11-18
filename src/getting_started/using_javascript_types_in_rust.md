@@ -7,13 +7,11 @@ Here is a simple example of calling the same function with different return type
 use rustyscript::{Runtime, Error};
 
 fn main() -> Result<(), Error> {
-    let mut runtime = Runtime::new()?;
+    let mut runtime = Runtime::new(Default::default())?;
 
     let number: i32 = runtime.eval("1 + 1")?;
     let string: String = runtime.eval("1 + 1")?;
-
-    // You don't need to specify the type if it can be inferred
-    let float = runtime.eval("1 + 1")? + 1.0f64;
+    let float: f64 = runtime.eval("1 + 1")?;
 
     println!("Number: {}", number);
     println!("String: {}", string);

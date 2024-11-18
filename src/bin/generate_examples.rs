@@ -76,6 +76,7 @@ fn main() -> Result<(), anyhow::Error> {
     // Then we regenerate the examples
     let examples = extract_examples()?;
     for (path, src) in examples {
+        println!("Generating example: {:?}", path);
         let mut file = File::create(&path)?;
         file.write_all(src.as_bytes())?;
     }
