@@ -9,4 +9,3 @@ It will cover:
 - [Running multiple runtimes in parallel, and sharing runtime data between threads](multithreading.md)
 - [Restricting access from inside a non-sandboxed JS runtime](permissions.md)
 - [Using snapshots to increase startup time](snapshots.md)
-- [Using javascript types in rust, and vice versa](using_javascript_types_in_rust.md)

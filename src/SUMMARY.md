@@ -2,6 +2,7 @@
 
 - [Getting Started](getting_started/README.md)
     - [Hello World](getting_started/hello_world.md)
+    - [Using JavaScript Types in Rust](getting_started/using_javascript_types_in_rust.md)
     - [On Modules and import](getting_started/modules.md)
     - [The Sandbox](getting_started/sandbox.md)
     - [Runtime Options](getting_started/runtime_options.md)
@@ -12,7 +13,6 @@
 - [Advanced Topics](advanced/README.md)
     - [Asynchronous JavaScript](advanced/asynchronous_javascript.md)
     - [Calling Rust from JavaScript](advanced/calling_rust_from_javascript.md)
-    - [Using JavaScript Types in Rust](advanced/using_javascript_types_in_rust.md)
     - [Custom Extensions](advanced/custom_extensions.md)
     - [Multi-Threading](advanced/multithreading.md)
     - [NodeJS Compatibility](advanced/nodejs_compatibility.md)
