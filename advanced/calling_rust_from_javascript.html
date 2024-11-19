@@ -148,7 +148,7 @@
 <blockquote>
 <p>A more advanced and performant way to call rust from JS is through <a href="./custom_extensions.html">custom extensions</a>.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{serde_json, sync_callback, Error, Runtime};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     // Let's get a new runtime first
@@ -185,7 +185,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 }
 </code></pre></pre>
 <p>Async functions can be defined as well:</p>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, Error, Runtime};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     let mut runtime = Runtime::new(Default::default())?;

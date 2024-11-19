@@ -167,7 +167,7 @@ In many cases, however, this will not be sufficient.</p>
 The runtime's own tokio runtime is used to resolve the future.</p>
 <p>The event loop, and the implicit promise resolution, is handled by the runtime, transparently.<br />
 This is the simplest way to use async functions.</p>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{js_value::Promise, Error, Module, Runtime};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     let module = Module::new(
@@ -184,11 +184,13 @@ fn main() -&gt; Result&lt;(), Error&gt; {
     let tokio_runtime = runtime.tokio_runtime();
 
     // Call the function, and await the result
-    tokio_runtime.block_on(async {
-        let value: u32 = runtime.call_function_async(Some(&amp;handle), &quot;my_func&quot;, &amp;()).await?;
-        assert_eq!(value, 42);
+    let value: u32 = tokio_runtime.block_on(async {
+        runtime
+            .call_function_async(Some(&amp;handle), &quot;my_func&quot;, &amp;())
+            .await
     })?;
 
+    assert_eq!(value, 32);
     Ok(())
 }
 </code></pre></pre>
@@ -213,7 +215,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 
     // Resolve the promise
     // You could instead call `into_future` here, and await it, for a non-blocking version
-    let value = promise.into_value()?;
+    let value = promise.into_value(&amp;mut runtime)?;
     assert_eq!(value, 42);
 
     Ok(())

@@ -153,7 +153,7 @@
 <p><strong>Important note:</strong> All javascript files included in an extension MUST be included somewhere.
 I recommend using the file specified in <code>esm_entry_point</code> to include all other files.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime, RuntimeOptions};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Runtime, RuntimeOptions};
 use deno_core::{extension, op2};
 
 #[op2(fast)]

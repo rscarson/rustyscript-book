@@ -519,7 +519,7 @@ In many cases, however, this will not be sufficient.</p>
 The runtime's own tokio runtime is used to resolve the future.</p>
 <p>The event loop, and the implicit promise resolution, is handled by the runtime, transparently.<br />
 This is the simplest way to use async functions.</p>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{js_value::Promise, Error, Module, Runtime};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     let module = Module::new(
@@ -536,11 +536,13 @@ fn main() -&gt; Result&lt;(), Error&gt; {
     let tokio_runtime = runtime.tokio_runtime();
 
     // Call the function, and await the result
-    tokio_runtime.block_on(async {
-        let value: u32 = runtime.call_function_async(Some(&amp;handle), &quot;my_func&quot;, &amp;()).await?;
-        assert_eq!(value, 42);
+    let value: u32 = tokio_runtime.block_on(async {
+        runtime
+            .call_function_async(Some(&amp;handle), &quot;my_func&quot;, &amp;())
+            .await
     })?;
 
+    assert_eq!(value, 32);
     Ok(())
 }
 </code></pre></pre>
@@ -565,7 +567,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 
     // Resolve the promise
     // You could instead call `into_future` here, and await it, for a non-blocking version
-    let value = promise.into_value()?;
+    let value = promise.into_value(&amp;mut runtime)?;
     assert_eq!(value, 42);
 
     Ok(())
@@ -593,7 +595,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <blockquote>
 <p>A more advanced and performant way to call rust from JS is through <a href="advanced/./custom_extensions.html">custom extensions</a>.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{serde_json, sync_callback, Error, Runtime};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     // Let's get a new runtime first
@@ -630,7 +632,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 }
 </code></pre></pre>
 <p>Async functions can be defined as well:</p>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{async_callback, Error, Runtime};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     let mut runtime = Runtime::new(Default::default())?;
@@ -659,7 +661,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p><strong>Important note:</strong> All javascript files included in an extension MUST be included somewhere.
 I recommend using the file specified in <code>esm_entry_point</code> to include all other files.</p>
 </blockquote>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Module, Runtime, RuntimeOptions};
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{Error, Runtime, RuntimeOptions};
 use deno_core::{extension, op2};
 
 #[op2(fast)]
@@ -772,32 +774,52 @@ If you instead define the extension as follows:</p>
 <p>rustyscript is not thread-safe, due to limitations of the underlying engine, deno_core</p>
 <p>The <code>worker</code> feature (enabled by default) gets around this by defining worker threads, which can be used in parallel.<br />
 Workers use queries sent over channels to communicate with the main thread.</p>
+<blockquote>
+<p><strong>Important Note:</strong> You must call <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html"><code>init_platform</code></a> If you are using runtimes on multiple threads.
+The only exception is <code>WorkerPool</code>, sen below, which will call <code>init_platform</code> for you.</p>
+</blockquote>
 <p><a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.DefaultWorker.html"><code>DefaultWorker</code></a> is a very simple built-in worker implementation:</p>
-<pre><pre class="playground"><code class="language-rust">use rustyscript::{worker::{DefaultWorker, DefaultWorkerQuery}, Error, Module};
+<pre><pre class="playground"><code class="language-rust">use deno_core::serde_json;
+use rustyscript::{
+    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    Error, Module,
+};
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     let worker = DefaultWorker::new(Default::default())?;
 
     // Instruct the worker to load a module
+    // We can do with provided helper functions
     let module = Module::new(&quot;test.js&quot;, &quot;export function add(a, b) { return a + b; }&quot;);
-    let query = DefaultWorkerQuery::LoadMainModule(module);
-    worker.send(query)?;
-
-    // This module ID will be used to refer to the module in future queries
-    let module_id = worker.receive()?;
+    let query = DefaultWorkerQuery::LoadModule(module);
+    let response = worker.as_worker().send_and_await(query)?;
+    let module_id = if let DefaultWorkerResponse::ModuleId(id) = response {
+        id
+    } else {
+        let e = Error::Runtime(format!(&quot;Unexpected response: {:?}&quot;, response));
+        return Err(e);
+    };
 
     // Now we can call the function
-    let query = DefaultWorkerQuery::CallFunction(Some(module_id), &quot;add&quot;.to_string(), vec![1.into(), 2.into()]);
-    let response = worker.send_and_await(query)?;
-    if let DefaultWorkerQuery::Value(v) = response {
-        assert_eq!(v, 3.into());
+    let query = DefaultWorkerQuery::CallFunction(
+        Some(module_id),
+        &quot;add&quot;.to_string(),
+        vec![1.into(), 2.into()],
+    );
+    let response = worker.as_worker().send_and_await(query)?;
+    if let DefaultWorkerResponse::Value(v) = response {
+        let value: i32 = serde_json::from_value(v)?;
+        assert_eq!(value, 3);
     }
+
+    Ok(())
 }
 </code></pre></pre>
 <blockquote>
-<p>Note that the worker has built-in helpers for many operations - this example could be far more succinct, as seen <a href="https://github.com/rscarson/rustyscript/blob/master/examples/default_threaded_worker.rs">here</a>.</p>
+<p>Note that the worker has built-in helpers for many operations - this example could be far more succinct using the <code>load_module</code> and <code>call_function</code> helpers,
+which take care of the query/response boilerplate, as seen <a href="https://github.com/rscarson/rustyscript/blob/master/examples/default_threaded_worker.rs">here</a>.</p>
 </blockquote>
-<p>However, for many applications this will, of course, not be sufficient, in which case you can implement your own worker - <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_threaded_worker.rs">See this example</a></p>
+<p>However, for many applications the default worker will not be sufficient, in which case you can implement your own worker - <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_threaded_worker.rs">See this example</a></p>
 <hr />
 <p>The worker module also provides <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html"><code>WorkerPool</code></a>, which can be used to manage multiple workers.</p>
 <ul>
