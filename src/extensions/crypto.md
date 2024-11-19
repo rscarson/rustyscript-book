@@ -7,9 +7,12 @@ Populates the global `CryptoKey`, `Crypto`, `crypto`, and `SubtleCrypto` objects
 
 This extensions is sandbox safe. It is enabled by default.
 
------
+## Options
+**`RuntimeOptions::extension_options::crypto_seed`**
+- Optional seed the deno_crypto RNG
+- Default: `None`
 
-Usage Example:
+## Usage Example
 ```js
 const key = await crypto.subtle.generateKey(
   {
