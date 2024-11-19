@@ -151,8 +151,13 @@
 </blockquote>
 <p>Populates the global <code>CryptoKey</code>, <code>Crypto</code>, <code>crypto</code>, and <code>SubtleCrypto</code> objects</p>
 <p>This extensions is sandbox safe. It is enabled by default.</p>
-<hr />
-<p>Usage Example:</p>
+<h2 id="options"><a class="header" href="#options">Options</a></h2>
+<p><strong><code>RuntimeOptions::extension_options::crypto_seed</code></strong></p>
+<ul>
+<li>Optional seed the deno_crypto RNG</li>
+<li>Default: <code>None</code></li>
+</ul>
+<h2 id="usage-example"><a class="header" href="#usage-example">Usage Example</a></h2>
 <pre><code class="language-js">const key = await crypto.subtle.generateKey(
   {
     name: &quot;AES-GCM&quot;,

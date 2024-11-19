@@ -1016,8 +1016,13 @@ All the remaining extensions depend on the <a href="extensions/web.html"><code>w
 </blockquote>
 <p>Populates the global <code>CryptoKey</code>, <code>Crypto</code>, <code>crypto</code>, and <code>SubtleCrypto</code> objects</p>
 <p>This extensions is sandbox safe. It is enabled by default.</p>
-<hr />
-<p>Usage Example:</p>
+<h2 id="options"><a class="header" href="#options">Options</a></h2>
+<p><strong><code>RuntimeOptions::extension_options::crypto_seed</code></strong></p>
+<ul>
+<li>Optional seed the deno_crypto RNG</li>
+<li>Default: <code>None</code></li>
+</ul>
+<h2 id="usage-example-1"><a class="header" href="#usage-example-1">Usage Example</a></h2>
 <pre><code class="language-js">const key = await crypto.subtle.generateKey(
   {
     name: &quot;AES-GCM&quot;,
@@ -1081,28 +1086,31 @@ setImmediate(() =&gt; {
 </ul>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cache"><a class="header" href="#cache">Cache</a></h1>
 <blockquote>
-<p>Crate features: [<code>broadcast_channel</code>, <code>network_extensions</code>]
-<a href="https://crates.io/crates/deno_broadcast_channel/">https://crates.io/crates/deno_broadcast_channel/</a><br />
-<a href="https://html.spec.whatwg.org/multipage/web-messaging.html">https://html.spec.whatwg.org/multipage/web-messaging.html</a></p>
+<p>Crate features: [<code>cache</code>, <code>io_extensions</code>]
+<a href="https://w3c.github.io/ServiceWorker/#cache-interface">https://w3c.github.io/ServiceWorker/#cache-interface</a></p>
 </blockquote>
-<p>Populates the global <code>BroadcastChannel</code> object.</p>
+<p>Populates the global <code>Cache</code>, <code>CacheStorage</code>, and <code>caches</code> objects.</p>
 <p>Not sandbox safe. Off by default</p>
-<h2 id="options"><a class="header" href="#options">Options</a></h2>
+<blockquote>
+<p><strong>Note</strong> <a href="https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions">query options</a> are not yet supported</p>
+</blockquote>
+<h2 id="options-1"><a class="header" href="#options-1">Options</a></h2>
 <p><strong><code>RuntimeOptions::extension_options::cache</code></strong></p>
 <ul>
-<li>The optional caching backend used by the extension.</li>
-<li>Default: <code>None</code></li>
+<li>The optional persistent caching backend used by the extension.</li>
+<li>Default: A non-persistent, in-memory cache</li>
 </ul>
-<p>To configure the cache, create an instance of the SQLite backend and pass it to the extension:</p>
+<p>The cache option can also be set to <code>None</code>, which will effectively disable the cache functionality.</p>
+<p>To configure the persistent cache, create an instance of the SQLite backend and pass it to the extension:</p>
 <pre><pre class="playground"><code class="language-rust">use rustyscript::{
-    extensions::deno_cache::{CreateCache, SqliteBackedCache},
-    ExtensionOptions, RuntimeOptions,
+    extensions::deno_cache::CreateCache,
+    ExtensionOptions, RuntimeOptions, CacheBackend
 };
 use std::sync::Arc;
 
 fn main() {
     let storage_dir = std::path::Path::new(&quot;deno_cache&quot;).to_path_buf();
-    let create_cache_fn = move || SqliteBackedCache::new(storage_dir.clone());
+    let create_cache_fn = move || CacheBackend::new_sqlite(storage_dir.clone());
     let cache = CreateCache(Arc::new(create_cache_fn));
 
     let _options = RuntimeOptions {
@@ -1115,20 +1123,29 @@ fn main() {
 }
 
 </code></pre></pre>
-<h2 id="usage-example-1"><a class="header" href="#usage-example-1">Usage Example</a></h2>
-<p>TODO</p>
+<h2 id="usage-example-2"><a class="header" href="#usage-example-2">Usage Example</a></h2>
+<pre><code class="language-javascript">let cache = await caches.open('my_cache');
+
+fetch('http://web.simmons.edu/').then((response) =&gt; {
+    cache.put('http://web.simmons.edu/', response);
+});
+
+cache.match('http://web.simmons.edu/').then((response) =&gt; {
+    console.log('Got response from cache!');
+});
+</code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="cron"><a class="header" href="#cron">Cron</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="ffi"><a class="header" href="#ffi">FFI</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="fs"><a class="header" href="#fs">FS</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="io"><a class="header" href="#io">IO</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="kv"><a class="header" href="#kv">KV</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="webgpu"><a class="header" href="#webgpu">WebGPU</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="deno-extensions-3"><a class="header" href="#deno-extensions-3">Deno Extensions</a></h1>
 <h2 id="network-extensions"><a class="header" href="#network-extensions">Network Extensions</a></h2>
 <p>All the extensions mentioned below can be activated using the <code>network_extensions</code> crate feature.</p>
@@ -1148,28 +1165,66 @@ fn main() {
 </blockquote>
 <p>Populates the global <code>BroadcastChannel</code> object.</p>
 <p>Not sandbox safe. Off by default</p>
-<h2 id="options-1"><a class="header" href="#options-1">Options</a></h2>
+<h2 id="options-2"><a class="header" href="#options-2">Options</a></h2>
 <p><strong><code>RuntimeOptions::extension_options::broadcast_channel</code></strong></p>
 <ul>
 <li>The channel object used by the extension.</li>
+<li>Default: <code>InMemoryBroadcastChannel::default()</code></li>
 </ul>
-<h2 id="usage-example-2"><a class="header" href="#usage-example-2">Usage Example</a></h2>
-<pre><code class="language-js">const channel = new BroadcastChannel(&quot;my_channel&quot;);
-channel.onmessage = (event) =&gt; {
-  console.log(event.data);
+<p>The channel can be cloned, and shared between runtimes to communicate between them.</p>
+<h2 id="usage-example-3"><a class="header" href="#usage-example-3">Usage Example</a></h2>
+<p>Below is an example of using the broadcast_channel extension to transfer data between Rust and JavaScript.
+The same technique can be used to communicate between seperate runtimes, by sharing the channel object.</p>
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{
+    extensions::deno_broadcast_channel::BroadcastChannel, Error, Module, Runtime, RuntimeOptions,
 };
-channel.postMessage(&quot;Hello, world!&quot;);
-channel.close();
-</code></pre>
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    // Let's extract the channel from the options
+    let options = RuntimeOptions::default();
+    let channel = options.extension_options.broadcast_channel.clone();
+
+    // Set up our runtime
+    let mut runtime = Runtime::new(options)?;
+    let tokio_runtime = runtime.tokio_runtime();
+
+    // Load our javascript
+    let module = Module::new(
+        &quot;test.js&quot;,
+        &quot;
+        const channel = new BroadcastChannel('my_channel');
+        channel.onmessage = (event) =&gt; {
+            console.log('Got message: ' + event.data);
+            channel.close();
+        };
+    &quot;,
+    );
+    tokio_runtime.block_on(runtime.load_module_async(&amp;module))?;
+    let resource = channel.subscribe().unwrap();
+
+    // Use a built-in helper function to serialize the data for transmission
+    let data: Vec&lt;u8&gt; = runtime.call_function(None, &quot;broadcast_serialize&quot;, &amp;(&quot;foo&quot;))?;
+    tokio_runtime.block_on(async {
+        channel
+            .send(&amp;resource, &quot;my_channel&quot;.to_string(), data)
+            .await
+            .unwrap();
+    });
+
+    // And run the event loop to completion
+    runtime.block_on_event_loop(Default::default(), None)?;
+    Ok(())
+}
+</code></pre></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="http"><a class="header" href="#http">HTTP</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="web"><a class="header" href="#web">Web</a></h1>
-<p>Mutually exclusive with the <code>web_stub</code> extension.
-Coming Soon</p>
+<p>Mutually exclusive with the <code>web_stub</code> extension.</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="websocket"><a class="header" href="#websocket">WebSocket</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="webstorage"><a class="header" href="#webstorage">WebStorage</a></h1>
-<p>Coming Soon</p>
+<p>TODO</p>
 
                     </main>
 

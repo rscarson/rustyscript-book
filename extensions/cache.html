@@ -145,28 +145,31 @@
                     <main>
                         <h1 id="cache"><a class="header" href="#cache">Cache</a></h1>
 <blockquote>
-<p>Crate features: [<code>broadcast_channel</code>, <code>network_extensions</code>]
-<a href="https://crates.io/crates/deno_broadcast_channel/">https://crates.io/crates/deno_broadcast_channel/</a><br />
-<a href="https://html.spec.whatwg.org/multipage/web-messaging.html">https://html.spec.whatwg.org/multipage/web-messaging.html</a></p>
+<p>Crate features: [<code>cache</code>, <code>io_extensions</code>]
+<a href="https://w3c.github.io/ServiceWorker/#cache-interface">https://w3c.github.io/ServiceWorker/#cache-interface</a></p>
 </blockquote>
-<p>Populates the global <code>BroadcastChannel</code> object.</p>
+<p>Populates the global <code>Cache</code>, <code>CacheStorage</code>, and <code>caches</code> objects.</p>
 <p>Not sandbox safe. Off by default</p>
+<blockquote>
+<p><strong>Note</strong> <a href="https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions">query options</a> are not yet supported</p>
+</blockquote>
 <h2 id="options"><a class="header" href="#options">Options</a></h2>
 <p><strong><code>RuntimeOptions::extension_options::cache</code></strong></p>
 <ul>
-<li>The optional caching backend used by the extension.</li>
-<li>Default: <code>None</code></li>
+<li>The optional persistent caching backend used by the extension.</li>
+<li>Default: A non-persistent, in-memory cache</li>
 </ul>
-<p>To configure the cache, create an instance of the SQLite backend and pass it to the extension:</p>
+<p>The cache option can also be set to <code>None</code>, which will effectively disable the cache functionality.</p>
+<p>To configure the persistent cache, create an instance of the SQLite backend and pass it to the extension:</p>
 <pre><pre class="playground"><code class="language-rust">use rustyscript::{
-    extensions::deno_cache::{CreateCache, SqliteBackedCache},
-    ExtensionOptions, RuntimeOptions,
+    extensions::deno_cache::CreateCache,
+    ExtensionOptions, RuntimeOptions, CacheBackend
 };
 use std::sync::Arc;
 
 fn main() {
     let storage_dir = std::path::Path::new(&quot;deno_cache&quot;).to_path_buf();
-    let create_cache_fn = move || SqliteBackedCache::new(storage_dir.clone());
+    let create_cache_fn = move || CacheBackend::new_sqlite(storage_dir.clone());
     let cache = CreateCache(Arc::new(create_cache_fn));
 
     let _options = RuntimeOptions {
@@ -180,7 +183,16 @@ fn main() {
 
 </code></pre></pre>
 <h2 id="usage-example"><a class="header" href="#usage-example">Usage Example</a></h2>
-<p>TODO</p>
+<pre><code class="language-javascript">let cache = await caches.open('my_cache');
+
+fetch('http://web.simmons.edu/').then((response) =&gt; {
+    cache.put('http://web.simmons.edu/', response);
+});
+
+cache.match('http://web.simmons.edu/').then((response) =&gt; {
+    console.log('Got response from cache!');
+});
+</code></pre>
 
                     </main>
 
