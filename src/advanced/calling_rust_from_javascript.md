@@ -3,7 +3,7 @@ rustyscript supports registering rust functions to be callable from JavaScript.
 > A more advanced and performant way to call rust from JS is through [custom extensions](./custom_extensions.md).
 
 ```rust
-use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+use rustyscript::{serde_json, sync_callback, Error, Runtime};
 
 fn main() -> Result<(), Error> {
     // Let's get a new runtime first
@@ -43,7 +43,7 @@ fn main() -> Result<(), Error> {
 Async functions can be defined as well:
 
 ```rust
-use rustyscript::{async_callback, serde_json, sync_callback, Error, Module, Runtime};
+use rustyscript::{async_callback, Error, Runtime};
 
 fn main() -> Result<(), Error> {
     let mut runtime = Runtime::new(Default::default())?;

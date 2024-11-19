@@ -20,7 +20,7 @@ The event loop, and the implicit promise resolution, is handled by the runtime, 
 This is the simplest way to use async functions.
 
 ```rust
-use rustyscript::{js_value::Promise, Error, Module, Runtime};
+use rustyscript::{Error, Module, Runtime};
 
 fn main() -> Result<(), Error> {
     let module = Module::new(
@@ -37,11 +37,13 @@ fn main() -> Result<(), Error> {
     let tokio_runtime = runtime.tokio_runtime();
 
     // Call the function, and await the result
-    tokio_runtime.block_on(async {
-        let value: u32 = runtime.call_function_async(Some(&handle), "my_func", &()).await?;
-        assert_eq!(value, 42);
+    let value: u32 = tokio_runtime.block_on(async {
+        runtime
+            .call_function_async(Some(&handle), "my_func", &())
+            .await
     })?;
 
+    assert_eq!(value, 32);
     Ok(())
 }
 ```
@@ -70,7 +72,7 @@ fn main() -> Result<(), Error> {
 
     // Resolve the promise
     // You could instead call `into_future` here, and await it, for a non-blocking version
-    let value = promise.into_value()?;
+    let value = promise.into_value(&mut runtime)?;
     assert_eq!(value, 42);
 
     Ok(())

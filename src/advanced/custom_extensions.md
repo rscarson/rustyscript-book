@@ -9,7 +9,7 @@ The following example demonstrates how to create a simple extension that adds tw
 > I recommend using the file specified in `esm_entry_point` to include all other files.
 
 ```rust
-use rustyscript::{Error, Module, Runtime, RuntimeOptions};
+use rustyscript::{Error, Runtime, RuntimeOptions};
 use deno_core::{extension, op2};
 
 #[op2(fast)]
