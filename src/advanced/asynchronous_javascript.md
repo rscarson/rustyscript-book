@@ -1,14 +1,30 @@
 # Asynchronous JavaScript
 By default, rustyscript can resolve most asynchronous javascript, including promises, by blocking the current thread.  
-In many cases, however, this will not be sufficient.
+In many cases, however, this will not be sufficient.  
+For example, handling ongoing background tasks, dealing with promises, or running async functions in parallel.
 
 To this end, many functions will have `_async` and `_immediate` variants.
-- `_async` functions will return a `Future` that that resolves when:
-    - The event loop is resolved, and
-    - If the value is a promise, the promise is resolved
-- `_immediate` functions will return a value immediately, but will not resolve promises or advance the event loop.
-    - Promises can be returned by specifying the return type as [`js_value::Promise`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html)
-    - The event loop should be run using [`Runtime::await_event_loop`]
+
+### `_async`
+`_async` functions will return a Future that that resolves when:
+- The event loop is resolved, and
+- If the value is a promise, the promise is resolved
+
+For example `call_function_async` will return a Future that resolves when the function call completes,  
+And, if the function returns a promise, when the promise is resolved.
+
+### `_immediate`
+`_immediate` functions will return a value immediately, but will not resolve promises or advance the event loop.
+- Promises can be returned by specifying the return type as [`js_value::Promise`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html)
+- The event loop should be run using [`Runtime::await_event_loop`]
+
+For example, `call_function_immediate` on a function returning a promise, will return a [`js_value::Promise<T>`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Promise.html) object, which can be resolved later.
+
+You can turn `Promise<T>` into `Future<Output = T>` by calling `Promise::into_future` This allows you to export multiple concurrent promises without borrowing the runtime mutably
+
+You can also use `Promise::into_value` to block until the promise is resolved, and get the value.
+
+-----
 
 A long-form example can be found [here](https://github.com/rscarson/rustyscript/blob/master/examples/async_javascript.rs)
 

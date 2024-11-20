@@ -2,8 +2,38 @@
 rustyscript supports registering rust functions to be callable from JavaScript. 
 > A more advanced and performant way to call rust from JS is through [custom extensions](./custom_extensions.md).
 
+## Blocking Functions
+
 ```rust
-use rustyscript::{serde_json, sync_callback, Error, Runtime};
+use rustyscript::{sync_callback, Error, Runtime};
+
+fn main() -> Result<(), Error> {
+    // Let's get a new runtime first
+    let mut runtime = Runtime::new(Default::default())?;
+
+    // We can use the helper macro to create a callback
+    // It will take care of deserializing arguments and serializing the result
+    runtime.register_function(
+        "add",
+        sync_callback!(|a: i64, b: i64| {
+            a.checked_add(b)
+                .ok_or(Error::Runtime("Overflow".to_string()))
+        }),
+    )?;
+
+    // The registered functions can now be called from JavaScript
+    runtime.eval::<()>("rustyscript.functions.add(1, 2)")?;
+
+    Ok(())
+}
+```
+
+-----
+Another option is to use a normal function, which can also be `move` if we want to capture some state:  
+You will need to handle serialization and deserialization yourself.
+
+```rust
+use rustyscript::{serde_json, Error, Runtime};
 
 fn main() -> Result<(), Error> {
     // Let's get a new runtime first
@@ -23,22 +53,14 @@ fn main() -> Result<(), Error> {
         Ok::<_, Error>(serde_json::Value::String(output))
     })?;
 
-    // There is also a helper macro to create a callback
-    // It will take care of deserializing arguments and serializing the result
-    runtime.register_function(
-        "add",
-        sync_callback!(|a: i64, b: i64| {
-            a.checked_add(b)
-                .ok_or(Error::Runtime("Overflow".to_string()))
-        }),
-    )?;
-
     // The registered functions can now be called from JavaScript
     runtime.eval::<()>("rustyscript.functions.echo('test')")?;
 
     Ok(())
 }
 ```
+
+## Async Functions
 
 Async functions can be defined as well:
 

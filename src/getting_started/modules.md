@@ -3,9 +3,9 @@
 
 By default, any javascript code can only import modules that have already been loaded with [`Runtime::load_module`](https://docs.rs/rustyscript/latest/rustyscript/runtime/struct.Runtime.html#method.load_module). This is a security feature to prevent arbitrary code from being loaded from the filesystem or network.
 
-### URL Schemes
-
 However, this can be changed with the `fs_import` and `url_import` features. These features allow the runtime to load modules from the filesystem or network respectively.
+
+### URL Schemes
 
 Custom URL Schemes can be added to a runtime with the `schema_whlist` field in the [`RuntimeOptions`](https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html) struct.
 - [Usage Example](https://github.com/rscarson/rustyscript/blob/master/examples/runtime_extensions.rs)

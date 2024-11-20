@@ -2,6 +2,8 @@
 
 - [Getting Started](getting_started/README.md)
     - [Hello World](getting_started/hello_world.md)
+    - [Calling Functions](getting_started/calling_functions.md)
+    - [Error Handling](getting_started/errors.md)
     - [Using JavaScript Types in Rust](getting_started/using_javascript_types_in_rust.md)
     - [On Modules and import](getting_started/modules.md)
     - [The Sandbox](getting_started/sandbox.md)

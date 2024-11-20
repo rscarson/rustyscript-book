@@ -1,4 +1,4 @@
-use rustyscript::{json_args, Runtime, RuntimeOptions, Module, Undefined};
+use rustyscript::{Runtime, RuntimeOptions, Module, Undefined};
 use std::time::Duration;
 
 fn main() -> Result<(), rustyscript::Error> {
@@ -23,9 +23,9 @@ fn main() -> Result<(), rustyscript::Error> {
     // Load can be called multiple times, and modules can import other loaded modules
     // Using `import './filename.js'`
     let module_handle = runtime.load_module(&module)?;
-    runtime.call_entrypoint::<Undefined>(&module_handle, json_args!(2))?;
+    runtime.call_entrypoint::<Undefined>(&module_handle, &(2))?;
 
     // Functions don't need to be the entrypoint to be callable!
-    let _internal_value: i64 = runtime.call_function(Some(&module_handle), "getValue", json_args!())?;
+    let _internal_value: i64 = runtime.call_function(Some(&module_handle), "getValue", &())?;
     Ok(())
 }

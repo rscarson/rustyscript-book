@@ -1,7 +1,7 @@
 # Getting Started
-## Extension Options
 
 [Back to Runtime Options](runtime_options.md)
+## Extension Options
 
 The built-in deno extensions have additional options that can be configured when creating a runtime. These options are provided in the[`ExtensionOptions`](https://docs.rs/rustyscript/latest/rustyscript/struct.ExtensionOptions.html) struct, which is a field of the [`RuntimeOptions`](https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html) struct.
 
@@ -19,7 +19,7 @@ Defines the filesystem implementation to use for the `deno_fs` extension
 
 ### cache [`cache`](../extensions/cache.md)
 Defines the cache configuration to use for the `deno_cache` extension
-- Disabled by default
+- Uses a non-persistent in-memory cache by default
 
 ### webstorage_origin_storage_dir [`webstorage`](../extensions/webstorage.md)
 Defines the directory where the webstorage extension will store its data

@@ -21,12 +21,12 @@ fn main() -> Result<(), Error> {
 }
 ```
 
-> If you don't care about the type of value being returned you can use:  
-> [`Rustyscript::Undefined`](https://docs.rs/rustyscript/latest/rustyscript/type.Undefined.html)
-> Or simply use `()`:
+> If you don't care about the type of value being returned you can simply use `()`:  
 >
 > For example, to call a function with side-effects, where no value is returned, you would do:  
-> `runtime.eval::<()>("console.log('Hello, World!')");`
+> `runtime.eval::<()>("console.log('Hello, World!')");`  
+>
+> Alternatively, if you want the value but do not care about the type, try [`js_value::Value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html)
 
 ## Special Types
 The [`js_value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/index.html) module defines a number of special types that can be used, which map more-or-less directly to JavaScript types.

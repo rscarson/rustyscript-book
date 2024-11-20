@@ -1,11 +1,11 @@
-use rustyscript::{json_args, Runtime, Module};
+use rustyscript::{Runtime, Module};
 
 fn main() -> Result<(), rustyscript::Error> {
     let module = Module::new(
         "test.js",
         "
-        export default (string, integer) => {
-            console.log(`Hello world: string=${string}, integer=${integer}`);
+        export default (string) => {
+            console.log(`Hello world: string=${string}`);
             return 2;
         }
         "
@@ -14,7 +14,7 @@ fn main() -> Result<(), rustyscript::Error> {
     let value: usize = Runtime::execute_module(
         &module, vec![],
         Default::default(),
-        json_args!("test", 5)
+        &("test"),
     )?;
 
     assert_eq!(value, 2);

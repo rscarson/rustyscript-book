@@ -1,20 +1,20 @@
-# Broadcast Channel
+# Network Extensions
+## Broadcast Channel
 > Crate features: [`broadcast_channel`, `network_extensions`]
 > <https://crates.io/crates/deno_broadcast_channel/>  
 > <https://html.spec.whatwg.org/multipage/web-messaging.html>
 
-Populates the global `BroadcastChannel` object.
+Populates the global `BroadcastChannel` object.  
+**Not sandbox safe. Off by default**
 
-Not sandbox safe. Off by default
-
-## Options
+### Options
 **`RuntimeOptions::extension_options::broadcast_channel`**
 - The channel object used by the extension.
 - Default: `InMemoryBroadcastChannel::default()`
 
 The channel can be cloned, and shared between runtimes to communicate between them.
 
-## Usage Example
+### Usage Example
 Below is an example of using the broadcast_channel extension to transfer data between Rust and JavaScript.
 The same technique can be used to communicate between seperate runtimes, by sharing the channel object.
 

@@ -1,14 +1,15 @@
-# Cache
-> Crate features: [`cache`, `io_extensions`]
+# IO Extensions
+## Cache
+> Crate features: [`cache`, `io_extensions`]  
+> <https://crates.io/crates/deno_cache>  
 > <https://w3c.github.io/ServiceWorker/#cache-interface>  
 
-Populates the global `Cache`, `CacheStorage`, and `caches` objects.
+Populates the global `Cache`, `CacheStorage`, and `caches` objects.  
+**Not sandbox safe. Off by default**
 
-Not sandbox safe. Off by default
+> **Note** [query options](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions) are not yet supported for the `Cache.match` method.
 
-> **Note** [query options](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions) are not yet supported
-
-## Options
+### Options
 **`RuntimeOptions::extension_options::cache`**
 - The optional persistent caching backend used by the extension.
 - Default: A non-persistent, in-memory cache
@@ -17,17 +18,11 @@ The cache option can also be set to `None`, which will effectively disable the c
 
 To configure the persistent cache, create an instance of the SQLite backend and pass it to the extension:
 ```rust
-use rustyscript::{
-    extensions::deno_cache::CreateCache,
-    ExtensionOptions, RuntimeOptions, CacheBackend
-};
-use std::sync::Arc;
+use rustyscript::{CacheBackend, ExtensionOptions, RuntimeOptions};
 
 fn main() {
-    let storage_dir = std::path::Path::new("deno_cache").to_path_buf();
-    let create_cache_fn = move || CacheBackend::new_sqlite(storage_dir.clone());
-    let cache = CreateCache(Arc::new(create_cache_fn));
-
+    // Will store the cache in a directory called "deno_cache"
+    let cache = CacheBackend::new_sqlite("deno_cache").unwrap();
     let _options = RuntimeOptions {
         extension_options: ExtensionOptions {
             cache: Some(cache),
@@ -36,10 +31,9 @@ fn main() {
         ..Default::default()
     };
 }
-
 ```
 
-## Usage Example
+### Usage Example
 ```javascript
 let cache = await caches.open('my_cache');
 

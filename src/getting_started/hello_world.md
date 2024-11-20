@@ -6,14 +6,14 @@ Here is a very basic use of this crate to execute a JS module. It will:
 - Load a javascript module,
 - Call a function and the resulting value
 ```rust
-use rustyscript::{json_args, Runtime, Module};
+use rustyscript::{Runtime, Module};
 
 fn main() -> Result<(), rustyscript::Error> {
     let module = Module::new(
         "test.js",
         "
-        export default (string, integer) => {
-            console.log(`Hello world: string=${string}, integer=${integer}`);
+        export default (string) => {
+            console.log(`Hello world: string=${string}`);
             return 2;
         }
         "
@@ -22,7 +22,7 @@ fn main() -> Result<(), rustyscript::Error> {
     let value: usize = Runtime::execute_module(
         &module, vec![],
         Default::default(),
-        json_args!("test", 5)
+        &("test"),
     )?;
 
     assert_eq!(value, 2);
@@ -37,7 +37,7 @@ Or included statically with the [`module!`](https://docs.rs/rustyscript/latest/r
 
 Here is a more detailed version example above, which breaks down the steps instead of using the one-liner [`Runtime::execute_module`](https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html#method.execute_module):
 ```rust
-use rustyscript::{json_args, Runtime, RuntimeOptions, Module, Undefined};
+use rustyscript::{Runtime, RuntimeOptions, Module, Undefined};
 use std::time::Duration;
 
 fn main() -> Result<(), rustyscript::Error> {
@@ -62,10 +62,10 @@ fn main() -> Result<(), rustyscript::Error> {
     // Load can be called multiple times, and modules can import other loaded modules
     // Using `import './filename.js'`
     let module_handle = runtime.load_module(&module)?;
-    runtime.call_entrypoint::<Undefined>(&module_handle, json_args!(2))?;
+    runtime.call_entrypoint::<Undefined>(&module_handle, &(2))?;
 
     // Functions don't need to be the entrypoint to be callable!
-    let _internal_value: i64 = runtime.call_function(Some(&module_handle), "getValue", json_args!())?;
+    let _internal_value: i64 = runtime.call_function(Some(&module_handle), "getValue", &())?;
     Ok(())
 }
 ```
@@ -83,11 +83,11 @@ fn main() {
 
 Or, if you just need to import one Javascript module for use in rust:
 ```rust
-use rustyscript::{json_args, import};
+use rustyscript::{import};
 
 fn main() {
     let mut module = import("js/my_module.js").expect("Something went wrong!");
-    let value: String = module.call("exported_function_name", json_args!()).expect("Could not get a value!");
+    let value: String = module.call("exported_function_name", &()).expect("Could not get a value!");
     println!("{value}");
 }
 ```

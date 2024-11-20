@@ -1,12 +1,8 @@
 # Custom Extensions
-> Note that the examples in this chapter require your crate to supply the **same version** of [`deno_core`](https://crates.io/crates/deno_core) as rustyscript uses - this version can be checked [here](https://crates.io/crates/rustyscript/latest/dependencies)
+> **Important note:** that the examples in this chapter require your crate to supply the **same version** of [`deno_core`](https://crates.io/crates/deno_core) as rustyscript uses - this version can be checked [here](https://crates.io/crates/rustyscript/latest/dependencies)
 
-The most performant way to extend rustyscript is to use the `extension` feature of deno_core.
-
+The most performant way to extend rustyscript is to use the `extension` feature of deno_core.  
 The following example demonstrates how to create a simple extension that adds two numbers together.
-
-> **Important note:** All javascript files included in an extension MUST be included somewhere.
-> I recommend using the file specified in `esm_entry_point` to include all other files.
 
 ```rust
 use rustyscript::{Error, Runtime, RuntimeOptions};
@@ -49,12 +45,17 @@ export const add = (a, b) => Deno.core.ops.op_add_example(a, b);
 globalThis.my_add = add;
 ```
 
+> **Important note:** All javascript files included in an extension MUST be included somewhere.
+> I recommend using the file specified in `esm_entry_point` to include all other files.
+
 ## Op2
 `Op2` is a deno-provided macro that allows you to define an extension function.
 - The supported types for arguments can be found listed in <https://github.com/denoland/deno_core/blob/main/ops/op2/valid_args.md>
 - And return types, here: <https://github.com/denoland/deno_core/blob/main/ops/op2/valid_retvals.md>
 
 The `fast` attribute used when possible to denote that the types involved can be converted fast. Don't stress too much on when to use this, as the compiler will tell you if you need it, or do not.
+
+Ops defined in an extension can then be called from javascript using `Deno.core.ops.op_name(args...)`.
 
 -----
 
