@@ -143,7 +143,38 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h1>
+                        <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+<h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
+<p>The crate includes an <a href="https://docs.rs/rustyscript/latest/rustyscript/error/enum.Error.html">error type</a> that can catch any errors that can occur during runtime execution.</p>
+<p>A few important variants include:</p>
+<blockquote>
+<p><code>Error::JsError</code><br />
+This is the most common error you will see, and is thrown by the JS runtime. It contains the error message and the stack trace.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::JsonDecode</code><br />
+You will see this error if you try to decode a return value to an incompatible type.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::Timeout</code><br />
+This error is thrown when runtime execution takes longer than the runtime's configured timeout.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::ValueNotCallable</code><br />
+This error is thrown when you try to call a value that is not a function.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::ValueNotFound</code><br />
+This error is thrown when you try to access a value that does not exist.</p>
+</blockquote>
+<hr />
+<p>You can get JS-side errors as a code-highlighted string by calling <a href="https://docs.rs/rustyscript/latest/rustyscript/error/enum.Error.html#method.as_highlighted"><code>error.as_highlighted()</code></a></p>
+<p>You will get a string of the form:</p>
+<pre><code>| let x = 1 + 2  
+|       ^  
+= Unexpected token '='  
+</code></pre>
+<p>You can customize this output to include the filename, line or column numbers.</p>
 
                     </main>
 

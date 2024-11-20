@@ -292,8 +292,51 @@ fn main() {
 </code></pre></pre>
 <p>There are a few other utilities included, such as <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.validate.html"><code>validate</code></a> and <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.resolve_path.html"><code>resolve_path</code></a></p>
 <hr />
-<div style="break-before: page; page-break-before: always;"></div><h1 id="calling-functions"><a class="header" href="#calling-functions">Calling Functions</a></h1>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="error-handling"><a class="header" href="#error-handling">Error Handling</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-2"><a class="header" href="#getting-started-2">Getting Started</a></h1>
+<h2 id="calling-functions"><a class="header" href="#calling-functions">Calling Functions</a></h2>
+<p>You may have noticed the <code>&amp;()</code> in the previous chapter's example - this is because the function <code>getValue</code> does not take any arguments.</p>
+<p>Arguments are normally passed as references to tuples, for example:<br />
+<code>&amp;(&quot;test&quot;, 1)</code>, <code>&amp;(&quot;test&quot;)</code>, or <code>&amp;()</code></p>
+<p>They can be of any combination of types that implement <code>serde::Serialize</code></p>
+<p>Arguments can also be references to sized values, such as:<br />
+<code>&amp;&quot;test&quot;.to_string()</code> or <code>&amp;1</code></p>
+<blockquote>
+<p><strong>Important Note:</strong> Up to 16 arguments can be passed in this way<br />
+If you need more than 16 arguments, you can use <a href="https://docs.rs/rustyscript/latest/rustyscript/macro.big_json_args.html"><code>big_json_args!</code></a></p>
+<p>Please note: This macro is significantly slower — benchmark tests show it can be nearly 1,000 times slower than using a smaller argument set. Use sparingly to avoid performance bottlenecks.</p>
+</blockquote>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-3"><a class="header" href="#getting-started-3">Getting Started</a></h1>
+<h2 id="errors"><a class="header" href="#errors">Errors</a></h2>
+<p>The crate includes an <a href="https://docs.rs/rustyscript/latest/rustyscript/error/enum.Error.html">error type</a> that can catch any errors that can occur during runtime execution.</p>
+<p>A few important variants include:</p>
+<blockquote>
+<p><code>Error::JsError</code><br />
+This is the most common error you will see, and is thrown by the JS runtime. It contains the error message and the stack trace.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::JsonDecode</code><br />
+You will see this error if you try to decode a return value to an incompatible type.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::Timeout</code><br />
+This error is thrown when runtime execution takes longer than the runtime's configured timeout.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::ValueNotCallable</code><br />
+This error is thrown when you try to call a value that is not a function.</p>
+</blockquote>
+<blockquote>
+<p><code>Error::ValueNotFound</code><br />
+This error is thrown when you try to access a value that does not exist.</p>
+</blockquote>
+<hr />
+<p>You can get JS-side errors as a code-highlighted string by calling <a href="https://docs.rs/rustyscript/latest/rustyscript/error/enum.Error.html#method.as_highlighted"><code>error.as_highlighted()</code></a></p>
+<p>You will get a string of the form:</p>
+<pre><code>| let x = 1 + 2  
+|       ^  
+= Unexpected token '='  
+</code></pre>
+<p>You can customize this output to include the filename, line or column numbers.</p>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="using-javascript-types-in-rust"><a class="header" href="#using-javascript-types-in-rust">Using JavaScript Types in Rust</a></h1>
 <p>Many functions on a <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.Runtime.html"><code>Runtime</code></a> are generic over a type parameter <code>T</code>, used to specify the expected return type from the executed javascript code.</p>
 <ul>
@@ -345,7 +388,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p>A generic type able to represent any JavaScript value. This mimics the behavior of the <code>any</code> type in TypeScript.</p>
 <p>The primary use-case is to defer the normal type-decoding if the type is not known right away. This is done with <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.try_into"><code>Value::try_into</code></a>, which must be called with the same runtime as the value was created with.</p>
 <p>It can also be used to directly get the underlying deno value, using <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.into_v8"><code>Value::into_v8</code></a>.</p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-2"><a class="header" href="#getting-started-2">Getting Started</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-4"><a class="header" href="#getting-started-4">Getting Started</a></h1>
 <h2 id="on-modules-and-including-them"><a class="header" href="#on-modules-and-including-them">On Modules and Including them</a></h2>
 <p>By default, any javascript code can only import modules that have already been loaded with <a href="https://docs.rs/rustyscript/latest/rustyscript/runtime/struct.Runtime.html#method.load_module"><code>Runtime::load_module</code></a>. This is a security feature to prevent arbitrary code from being loaded from the filesystem or network.</p>
 <p>However, this can be changed with the <code>fs_import</code> and <code>url_import</code> features. These features allow the runtime to load modules from the filesystem or network respectively.</p>
@@ -366,7 +409,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <li>It can be used to implement a cache: <a href="https://github.com/rscarson/rustyscript/blob/master/examples/module_loader_cache.rs">Example</a></li>
 <li>Or to provide custom import logic: <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_import_logic.rs">Example</a></li>
 </ul>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-3"><a class="header" href="#getting-started-3">Getting Started</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-5"><a class="header" href="#getting-started-5">Getting Started</a></h1>
 <h2 id="the-sandbox"><a class="header" href="#the-sandbox">The Sandbox</a></h2>
 <p>One of the guiding principles of <code>rustyscript</code> is to provide a safe sandboxed environment for running JavaScript code by default.</p>
 <blockquote>
@@ -396,7 +439,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p><strong>Note:</strong> Extension is a Deno term referring to a subset of the JS standard API.
 rustyscript provides these as crate features that can be enabled or disabled at compile time.</p>
 </blockquote>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-4"><a class="header" href="#getting-started-4">Getting Started</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-6"><a class="header" href="#getting-started-6">Getting Started</a></h1>
 <h2 id="runtime-options"><a class="header" href="#runtime-options">Runtime Options</a></h2>
 <p>To create a runtime, you will need to provide a <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a> struct. This struct contains all the configuration options for the runtime, such as the extensions to load, the entrypoint to use, and the maximum heap size.</p>
 <p>It implements the <code>Default</code> trait, so you can create a default configuration by calling <code>RuntimeOptions::default()</code>.</p>
@@ -435,7 +478,7 @@ Allows data-sharing between runtimes across threads</p>
 <p>A whitelist of custom schema prefixes that are allowed to be loaded from javascript<br />
 By default only <code>http</code>/<code>https</code> (<code>url_import</code> crate feature), and <code>file</code> (<code>fs_import</code> crate feature) are allowed<br />
 See <a href="getting_started/modules.html">On Modules and import</a></p>
-<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-5"><a class="header" href="#getting-started-5">Getting Started</a></h1>
+<div style="break-before: page; page-break-before: always;"></div><h1 id="getting-started-7"><a class="header" href="#getting-started-7">Getting Started</a></h1>
 <p><a href="getting_started/runtime_options.html">Back to Runtime Options</a></p>
 <h2 id="extension-options"><a class="header" href="#extension-options">Extension Options</a></h2>
 <p>The built-in deno extensions have additional options that can be configured when creating a runtime. These options are provided in the<a href="https://docs.rs/rustyscript/latest/rustyscript/struct.ExtensionOptions.html"><code>ExtensionOptions</code></a> struct, which is a field of the <a href="https://docs.rs/rustyscript/latest/rustyscript/struct.RuntimeOptions.html"><code>RuntimeOptions</code></a> struct.</p>
