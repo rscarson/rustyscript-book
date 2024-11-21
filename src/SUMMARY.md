@@ -46,3 +46,5 @@
         - [Web](extensions/web.md)
         - [WebSocket](extensions/websocket.md)
         - [WebStorage](extensions/webstorage.md)
+
+    - [NodeJS Extensions](extensions/nodejs_extensions.md)
