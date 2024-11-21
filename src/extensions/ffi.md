@@ -1,9 +1,9 @@
 # IO Extensions
 ## FFI
-> Crate features: [`ffi`, `io_extensions`]. 
+> Crate features: [`ffi`, `io_extensions`].  
 > <https://crates.io/crates/deno_ffi>  
 
-Populates the `Deno.dlopen`, `Deno.UnsafeCallback`, `Deno.UnsafePointer`, `Deno.UnsafePointerView`, `Deno.UnsafeFnPointer` globals. 
+Populates the `Deno.dlopen`, `Deno.UnsafeCallback`, `Deno.UnsafePointer`, `Deno.UnsafePointerView`, `Deno.UnsafeFnPointer` globals.  
 **Not sandbox safe. Off by default**
 
 
