@@ -159,20 +159,9 @@ static_runtime!(MY_CUSTOM_RUNTIME, {
 });
 
 fn main() -&gt; Result&lt;(), Error&gt; {
-    // And it can be accessed either with a lock:
-    MY_DEFAULT_RUNTIME.with(|rt| {
-        let mut lock = rt.lock()?;
-        lock.runtime().eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;)
-    })?;
-
-    // Or with a closure
-    MY_CUSTOM_RUNTIME.with(|rt| {
-        rt.with_runtime(|runtime| {
-            runtime.eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;)
-        })
-    })??;
-
-    Ok(())
+    MY_DEFAULT_RUNTIME::with(|runtime| {
+        runtime.eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;)
+    })
 }
 </code></pre></pre>
 <hr />

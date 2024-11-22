@@ -163,13 +163,14 @@
 <p>Below is an example of using the broadcast_channel extension to transfer data between Rust and JavaScript.
 The same technique can be used to communicate between seperate runtimes, by sharing the channel object.</p>
 <pre><pre class="playground"><code class="language-rust">use rustyscript::{
-    extensions::deno_broadcast_channel::BroadcastChannel, Error, Module, Runtime, RuntimeOptions,
+    BroadcastChannelWrapper, Error, Module, Runtime, RuntimeOptions,
 };
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     // Let's extract the channel from the options
     let options = RuntimeOptions::default();
     let channel = options.extension_options.broadcast_channel.clone();
+    let channel = BroadcastChannelWrapper::new(&amp;channel, &quot;my_channel&quot;)?;
 
     // Set up our runtime
     let mut runtime = Runtime::new(options)?;
@@ -187,16 +188,9 @@ fn main() -&gt; Result&lt;(), Error&gt; {
     &quot;,
     );
     tokio_runtime.block_on(runtime.load_module_async(&amp;module))?;
-    let resource = channel.subscribe().unwrap();
 
     // Use a built-in helper function to serialize the data for transmission
-    let data: Vec&lt;u8&gt; = runtime.call_function(None, &quot;broadcast_serialize&quot;, &amp;(&quot;foo&quot;))?;
-    tokio_runtime.block_on(async {
-        channel
-            .send(&amp;resource, &quot;my_channel&quot;.to_string(), data)
-            .await
-            .unwrap();
-    });
+    channel.send_sync(&amp;mut runtime, &quot;foo&quot;)?;
 
     // And run the event loop to completion
     runtime.block_on_event_loop(Default::default(), None)?;

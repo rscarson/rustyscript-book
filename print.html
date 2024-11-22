@@ -538,7 +538,9 @@ See <a href="getting_started/modules.html">On Modules and import</a></p>
 <li><a href="advanced/asynchronous_javascript.html">Managing asynchronous JS, including promises, and background tasks</a></li>
 <li><a href="advanced/calling_rust_from_javascript.html">Call sync and async rust from inside the JS runtime, as well as transfering data between the two</a></li>
 <li><a href="advanced/custom_extensions.html">Extending the JS runtime with more advanced custom functionality (extensions and op2)</a></li>
+<li><a href="advanced/static_runtime.html">Creating a static runtime instance</a></li>
 <li><a href="advanced/multithreading.html">Running multiple runtimes in parallel, and sharing runtime data between threads</a></li>
+<li><a href="advanced/nodejs_compatibility.html">NodeJS compatibility, including using the NodeJS standard library</a></li>
 <li><a href="advanced/permissions.html">Restricting access from inside a non-sandboxed JS runtime</a></li>
 <li><a href="advanced/snapshots.html">Using snapshots to increase startup time</a></li>
 </ul>
@@ -856,20 +858,9 @@ static_runtime!(MY_CUSTOM_RUNTIME, {
 });
 
 fn main() -&gt; Result&lt;(), Error&gt; {
-    // And it can be accessed either with a lock:
-    MY_DEFAULT_RUNTIME.with(|rt| {
-        let mut lock = rt.lock()?;
-        lock.runtime().eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;)
-    })?;
-
-    // Or with a closure
-    MY_CUSTOM_RUNTIME.with(|rt| {
-        rt.with_runtime(|runtime| {
-            runtime.eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;)
-        })
-    })??;
-
-    Ok(())
+    MY_DEFAULT_RUNTIME::with(|runtime| {
+        runtime.eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;)
+    })
 }
 </code></pre></pre>
 <hr />
@@ -1418,13 +1409,14 @@ https://github.com/gpuweb/gpuweb/tree/main/design&gt;<br />
 <p>Below is an example of using the broadcast_channel extension to transfer data between Rust and JavaScript.
 The same technique can be used to communicate between seperate runtimes, by sharing the channel object.</p>
 <pre><pre class="playground"><code class="language-rust">use rustyscript::{
-    extensions::deno_broadcast_channel::BroadcastChannel, Error, Module, Runtime, RuntimeOptions,
+    BroadcastChannelWrapper, Error, Module, Runtime, RuntimeOptions,
 };
 
 fn main() -&gt; Result&lt;(), Error&gt; {
     // Let's extract the channel from the options
     let options = RuntimeOptions::default();
     let channel = options.extension_options.broadcast_channel.clone();
+    let channel = BroadcastChannelWrapper::new(&amp;channel, &quot;my_channel&quot;)?;
 
     // Set up our runtime
     let mut runtime = Runtime::new(options)?;
@@ -1442,16 +1434,9 @@ fn main() -&gt; Result&lt;(), Error&gt; {
     &quot;,
     );
     tokio_runtime.block_on(runtime.load_module_async(&amp;module))?;
-    let resource = channel.subscribe().unwrap();
 
     // Use a built-in helper function to serialize the data for transmission
-    let data: Vec&lt;u8&gt; = runtime.call_function(None, &quot;broadcast_serialize&quot;, &amp;(&quot;foo&quot;))?;
-    tokio_runtime.block_on(async {
-        channel
-            .send(&amp;resource, &quot;my_channel&quot;.to_string(), data)
-            .await
-            .unwrap();
-    });
+    channel.send_sync(&amp;mut runtime, &quot;foo&quot;)?;
 
     // And run the event loop to completion
     runtime.block_on_event_loop(Default::default(), None)?;
