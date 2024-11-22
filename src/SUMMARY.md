@@ -16,6 +16,7 @@
     - [Asynchronous JavaScript](advanced/asynchronous_javascript.md)
     - [Calling Rust from JavaScript](advanced/calling_rust_from_javascript.md)
     - [Custom Extensions](advanced/custom_extensions.md)
+    - [Static Runtimes](advanced/static_runtime.md)
     - [Multi-Threading](advanced/multithreading.md)
     - [NodeJS Compatibility](advanced/nodejs_compatibility.md)
     - [Permissions](advanced/permissions.md)
