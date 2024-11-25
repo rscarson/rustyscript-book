@@ -169,7 +169,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p>If you don't care about the type of value being returned you can simply use <code>()</code>:</p>
 <p>For example, to call a function with side-effects, where no value is returned, you would do:<br />
 <code>runtime.eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;);</code></p>
-<p>Alternatively, if you want the value but do not care about the type, try <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html"><code>js_value::Value</code></a></p>
+<p>Alternatively, if you want the value but do not care about the type, try <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html"><code>js_value::Value</code></a></p>
 </blockquote>
 <h2 id="special-types"><a class="header" href="#special-types">Special Types</a></h2>
 <p>The <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/index.html"><code>js_value</code></a> module defines a number of special types that can be used, which map more-or-less directly to JavaScript types.</p>
@@ -190,7 +190,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p>This type can be faster for large objects than directly deserializing into a rust type.</p>
 <h3 id="a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructstringhtmljs_valuestringa"><a class="header" href="#a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructstringhtmljs_valuestringa"><a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.String.html"><code>js_value::String</code></a></a></h3>
 <p>A Javascript UTF-16 string, used to preserve data which can be lost converting to a Rust <code>String</code>.</p>
-<h3 id="a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valueenumvaluehtmljs_valuevaluea"><a class="header" href="#a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valueenumvaluehtmljs_valuevaluea"><a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html"><code>js_value::Value</code></a></a></h3>
+<h3 id="a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructvaluehtmljs_valuevaluea"><a class="header" href="#a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructvaluehtmljs_valuevaluea"><a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html"><code>js_value::Value</code></a></a></h3>
 <p>A generic type able to represent any JavaScript value. This mimics the behavior of the <code>any</code> type in TypeScript.</p>
 <p>The primary use-case is to defer the normal type-decoding if the type is not known right away. This is done with <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.try_into"><code>Value::try_into</code></a>, which must be called with the same runtime as the value was created with.</p>
 <p>It can also be used to directly get the underlying deno value, using <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.into_v8"><code>Value::into_v8</code></a>.</p>

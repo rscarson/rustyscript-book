@@ -363,7 +363,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p>If you don't care about the type of value being returned you can simply use <code>()</code>:</p>
 <p>For example, to call a function with side-effects, where no value is returned, you would do:<br />
 <code>runtime.eval::&lt;()&gt;(&quot;console.log('Hello, World!')&quot;);</code></p>
-<p>Alternatively, if you want the value but do not care about the type, try <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html"><code>js_value::Value</code></a></p>
+<p>Alternatively, if you want the value but do not care about the type, try <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html"><code>js_value::Value</code></a></p>
 </blockquote>
 <h2 id="special-types"><a class="header" href="#special-types">Special Types</a></h2>
 <p>The <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/index.html"><code>js_value</code></a> module defines a number of special types that can be used, which map more-or-less directly to JavaScript types.</p>
@@ -384,7 +384,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 <p>This type can be faster for large objects than directly deserializing into a rust type.</p>
 <h3 id="a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructstringhtmljs_valuestringa"><a class="header" href="#a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructstringhtmljs_valuestringa"><a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.String.html"><code>js_value::String</code></a></a></h3>
 <p>A Javascript UTF-16 string, used to preserve data which can be lost converting to a Rust <code>String</code>.</p>
-<h3 id="a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valueenumvaluehtmljs_valuevaluea"><a class="header" href="#a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valueenumvaluehtmljs_valuevaluea"><a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html"><code>js_value::Value</code></a></a></h3>
+<h3 id="a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructvaluehtmljs_valuevaluea"><a class="header" href="#a-hrefhttpsdocsrsrustyscriptlatestrustyscriptjs_valuestructvaluehtmljs_valuevaluea"><a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html"><code>js_value::Value</code></a></a></h3>
 <p>A generic type able to represent any JavaScript value. This mimics the behavior of the <code>any</code> type in TypeScript.</p>
 <p>The primary use-case is to defer the normal type-decoding if the type is not known right away. This is done with <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.try_into"><code>Value::try_into</code></a>, which must be called with the same runtime as the value was created with.</p>
 <p>It can also be used to directly get the underlying deno value, using <a href="https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.into_v8"><code>Value::into_v8</code></a>.</p>
@@ -956,7 +956,7 @@ Kindly report any issues you encounter.</p>
 This allows for a more fine-grained control over what can be accessed.</p>
 <p>This can be done by specifying a value for the <code>permissions: Arc&lt;dyn WebPermissions&gt;,</code> field in <code>RuntimeOptions::web</code>.</p>
 <p>The default value is <code>DefaultWebPermissions</code>, which simply allows everything.</p>
-<p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissionsSet.html"><code>AllowlistWebPermissionsSet</code></a> is also built-in, and allows for specific permissions to be turned on or off:</p>
+<p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissions.html"><code>AllowlistWebPermissionsSet</code></a> is also built-in, and allows for specific permissions to be turned on or off:</p>
 <pre><pre class="playground"><code class="language-rust">use rustyscript::{AllowlistWebPermissions, Error, Runtime, RuntimeOptions};
 use std::sync::Arc;
 
@@ -1247,12 +1247,24 @@ cache.match('http://web.simmons.edu/').then((response) =&gt; {
 <p>Populates the global <code>Deno.cron</code> object.<br />
 <strong>Not sandbox safe. Off by default</strong></p>
 <h3 id="usage-example-5"><a class="header" href="#usage-example-5">Usage Example</a></h3>
-<pre><code class="language-javascript">let cronHandler = () =&gt; new Promise((resolve) =&gt; {
-    console.log('Hello, world!');
+<pre><code class="language-javascript">// The abort signal can be used to cancel the job
+const ac = new AbortController();
+
+let cronHandler = () =&gt; new Promise((resolve) =&gt; {
+    console.log(&quot;This will print once per minute.&quot;);
     resolve();
 });
 
-Deno.cron('my-cron-job', '* * * * *', cronHandler)
+Deno.cron(
+    'my-cron-job', '* * * * *',
+    { signal: ac.signal },
+    cronHandler
+);
+
+// Abort the cron job after 1 seconds
+setTimeout(() =&gt; {
+    ac.abort();
+}, 1000);
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="io-extensions-3"><a class="header" href="#io-extensions-3">IO Extensions</a></h1>
 <h2 id="ffi"><a class="header" href="#ffi">FFI</a></h2>
@@ -1272,18 +1284,20 @@ Deno.cron('my-cron-job', '* * * * *', cronHandler)
 <pre><code class="language-javascript">const buffer = new ArrayBuffer(1024);
 const baseAddress = Deno.UnsafePointer.value(Deno.UnsafePointer.of(buffer));
 
-const throwCb = () =&gt; throw new Error(&quot;Error&quot;);
+const myCb = () =&gt; {
+    console.log(&quot;Hello from FFI&quot;);
+};
 const cb = new Deno.UnsafeCallback({
     parameters: [],
     result: &quot;void&quot;,
-}, throwCb);
+}, myCb);
 
 const fnPointer = new Deno.UnsafeFnPointer(cb.pointer, {
     parameters: [],
     result: &quot;void&quot;,
 });
 
-assertThrows(() =&gt; fnPointer.call());
+fnPointer.call();
 cb.close();
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="io-extensions-4"><a class="header" href="#io-extensions-4">IO Extensions</a></h1>
@@ -1319,8 +1333,8 @@ cb.close();
 const buf = new Uint8Array(100);
 file.readSync(buf);
 
-const file = Deno.openSync(&quot;/dev/null&quot;, { write: true });
-file.writeSync(buf);
+const file2 = Deno.openSync(&quot;/dev/null&quot;, { write: true });
+file2.writeSync(buf);
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="io-extensions-5"><a class="header" href="#io-extensions-5">IO Extensions</a></h1>
 <h2 id="io"><a class="header" href="#io">Io</a></h2>
@@ -1454,9 +1468,20 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 Populates the <code>Deno.serve</code>, <code>Deno.serveHttp</code>, and <code>Deno.upgradeWebSocket</code> functions.<br />
 <strong>Not sandbox safe. Off by default</strong></p>
 <h3 id="usage-example-11"><a class="header" href="#usage-example-11">Usage Example</a></h3>
-<pre><code class="language-ts">Deno.serve((_req: Request) =&gt; {
-  return new Response(&quot;Hello, world!&quot;);
-});
+<pre><code class="language-ts">// The abort signal is used to close the server
+const ac = new AbortController();
+
+try {
+  const server = Deno.serve(
+    { signal: ac.signal },
+    (_req) =&gt; new Response(&quot;Hello, world&quot;)
+  );
+} catch (err) {
+  console.error(&quot;Operation aborted&quot;);
+}
+
+// Close the server after 1 second
+setTimeout(() =&gt; ac.abort(), 1000);
 </code></pre>
 <div style="break-before: page; page-break-before: always;"></div><h1 id="web"><a class="header" href="#web">Web</a></h1>
 <blockquote>
@@ -1552,7 +1577,7 @@ The blob store to use for fetch</p>
 <li><code>allow_hrtime</code> - Allow high-resolution time measurements in timers</li>
 </ul>
 <h3 id="usage-example-12"><a class="header" href="#usage-example-12">Usage Example</a></h3>
-<pre><code class="language-javascript">fetch(&quot;https://example.com/data.json&quot;)
+<pre><code class="language-javascript">fetch(&quot;https://jsonplaceholder.typicode.com/todos/1&quot;)
   .then((response) =&gt; response.json())
   .then((data) =&gt; console.log(data));
 </code></pre>

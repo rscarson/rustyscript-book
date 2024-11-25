@@ -154,9 +154,20 @@
 Populates the <code>Deno.serve</code>, <code>Deno.serveHttp</code>, and <code>Deno.upgradeWebSocket</code> functions.<br />
 <strong>Not sandbox safe. Off by default</strong></p>
 <h3 id="usage-example"><a class="header" href="#usage-example">Usage Example</a></h3>
-<pre><code class="language-ts">Deno.serve((_req: Request) =&gt; {
-  return new Response(&quot;Hello, world!&quot;);
-});
+<pre><code class="language-ts">// The abort signal is used to close the server
+const ac = new AbortController();
+
+try {
+  const server = Deno.serve(
+    { signal: ac.signal },
+    (_req) =&gt; new Response(&quot;Hello, world&quot;)
+  );
+} catch (err) {
+  console.error(&quot;Operation aborted&quot;);
+}
+
+// Close the server after 1 second
+setTimeout(() =&gt; ac.abort(), 1000);
 </code></pre>
 
                     </main>

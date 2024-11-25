@@ -148,7 +148,7 @@
 This allows for a more fine-grained control over what can be accessed.</p>
 <p>This can be done by specifying a value for the <code>permissions: Arc&lt;dyn WebPermissions&gt;,</code> field in <code>RuntimeOptions::web</code>.</p>
 <p>The default value is <code>DefaultWebPermissions</code>, which simply allows everything.</p>
-<p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissionsSet.html"><code>AllowlistWebPermissionsSet</code></a> is also built-in, and allows for specific permissions to be turned on or off:</p>
+<p><a href="https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissions.html"><code>AllowlistWebPermissionsSet</code></a> is also built-in, and allows for specific permissions to be turned on or off:</p>
 <pre><pre class="playground"><code class="language-rust">use rustyscript::{AllowlistWebPermissions, Error, Runtime, RuntimeOptions};
 use std::sync::Arc;
 

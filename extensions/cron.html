@@ -152,12 +152,24 @@
 <p>Populates the global <code>Deno.cron</code> object.<br />
 <strong>Not sandbox safe. Off by default</strong></p>
 <h3 id="usage-example"><a class="header" href="#usage-example">Usage Example</a></h3>
-<pre><code class="language-javascript">let cronHandler = () =&gt; new Promise((resolve) =&gt; {
-    console.log('Hello, world!');
+<pre><code class="language-javascript">// The abort signal can be used to cancel the job
+const ac = new AbortController();
+
+let cronHandler = () =&gt; new Promise((resolve) =&gt; {
+    console.log(&quot;This will print once per minute.&quot;);
     resolve();
 });
 
-Deno.cron('my-cron-job', '* * * * *', cronHandler)
+Deno.cron(
+    'my-cron-job', '* * * * *',
+    { signal: ac.signal },
+    cronHandler
+);
+
+// Abort the cron job after 1 seconds
+setTimeout(() =&gt; {
+    ac.abort();
+}, 1000);
 </code></pre>
 
                     </main>

@@ -176,8 +176,8 @@
 const buf = new Uint8Array(100);
 file.readSync(buf);
 
-const file = Deno.openSync(&quot;/dev/null&quot;, { write: true });
-file.writeSync(buf);
+const file2 = Deno.openSync(&quot;/dev/null&quot;, { write: true });
+file2.writeSync(buf);
 </code></pre>
 
                     </main>

@@ -35,11 +35,16 @@ fn extract_examples() -> Result<Vec<(PathBuf, String)>, anyhow::Error> {
             continue;
         }
 
+        let extension = block.extension();
+        if &extension == "txt" {
+            continue;
+        }
+
         let filename = format!(
             "auto_{}_line_{}.{}",
             block.location.file.replace(['/', '\\', '.'], "_"),
             block.location.line,
-            block.extension(),
+            extension,
         );
         let parent = if block.is_rust() {
             Path::new("examples")

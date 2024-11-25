@@ -161,18 +161,20 @@
 <pre><code class="language-javascript">const buffer = new ArrayBuffer(1024);
 const baseAddress = Deno.UnsafePointer.value(Deno.UnsafePointer.of(buffer));
 
-const throwCb = () =&gt; throw new Error(&quot;Error&quot;);
+const myCb = () =&gt; {
+    console.log(&quot;Hello from FFI&quot;);
+};
 const cb = new Deno.UnsafeCallback({
     parameters: [],
     result: &quot;void&quot;,
-}, throwCb);
+}, myCb);
 
 const fnPointer = new Deno.UnsafeFnPointer(cb.pointer, {
     parameters: [],
     result: &quot;void&quot;,
 });
 
-assertThrows(() =&gt; fnPointer.call());
+fnPointer.call();
 cb.close();
 </code></pre>
 
