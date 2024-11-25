@@ -1,16 +1,18 @@
 const buffer = new ArrayBuffer(1024);
 const baseAddress = Deno.UnsafePointer.value(Deno.UnsafePointer.of(buffer));
 
-const throwCb = () => throw new Error("Error");
+const myCb = () => {
+    console.log("Hello from FFI");
+};
 const cb = new Deno.UnsafeCallback({
     parameters: [],
     result: "void",
-}, throwCb);
+}, myCb);
 
 const fnPointer = new Deno.UnsafeFnPointer(cb.pointer, {
     parameters: [],
     result: "void",
 });
 
-assertThrows(() => fnPointer.call());
+fnPointer.call();
 cb.close();

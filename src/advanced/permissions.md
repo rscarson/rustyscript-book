@@ -6,7 +6,7 @@ This can be done by specifying a value for the `permissions: Arc<dyn WebPermissi
 
 The default value is `DefaultWebPermissions`, which simply allows everything.
 
-[`AllowlistWebPermissionsSet`](https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissionsSet.html) is also built-in, and allows for specific permissions to be turned on or off:
+[`AllowlistWebPermissionsSet`](https://docs.rs/rustyscript/latest/rustyscript/struct.AllowlistWebPermissions.html) is also built-in, and allows for specific permissions to be turned on or off:
 
 ```rust
 use rustyscript::{AllowlistWebPermissions, Error, Runtime, RuntimeOptions};

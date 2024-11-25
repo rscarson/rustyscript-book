@@ -26,7 +26,7 @@ fn main() -> Result<(), Error> {
 > For example, to call a function with side-effects, where no value is returned, you would do:  
 > `runtime.eval::<()>("console.log('Hello, World!')");`  
 >
-> Alternatively, if you want the value but do not care about the type, try [`js_value::Value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html)
+> Alternatively, if you want the value but do not care about the type, try [`js_value::Value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html)
 
 ## Special Types
 The [`js_value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/index.html) module defines a number of special types that can be used, which map more-or-less directly to JavaScript types.
@@ -55,7 +55,7 @@ This type can be faster for large objects than directly deserializing into a rus
 ### [`js_value::String`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.String.html)
 A Javascript UTF-16 string, used to preserve data which can be lost converting to a Rust `String`.
 
-### [`js_value::Value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/enum.Value.html)
+### [`js_value::Value`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html)
 A generic type able to represent any JavaScript value. This mimics the behavior of the `any` type in TypeScript.
 
 The primary use-case is to defer the normal type-decoding if the type is not known right away. This is done with [`Value::try_into`](https://docs.rs/rustyscript/latest/rustyscript/js_value/struct.Value.html#method.try_into), which must be called with the same runtime as the value was created with.

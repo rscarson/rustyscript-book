@@ -80,7 +80,7 @@ Web is affected by the following methods in the permissions trait:
 
 ### Usage Example
 ```javascript
-fetch("https://example.com/data.json")
+fetch("https://jsonplaceholder.typicode.com/todos/1")
   .then((response) => response.json())
   .then((data) => console.log(data));
 ```
