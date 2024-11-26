@@ -31,7 +31,7 @@ pub fn test_links() {
         .iter()
         .filter_map(|item| match item {
             markdown::MarkdownItem::Link(link) => {
-                println!("Checking link: `{}`", link.location);
+                print!("Checking link: `{}`... ", link.location);
                 if let Err(e) = link.exists() {
                     let location = &link.location;
                     let e = e
@@ -40,8 +40,10 @@ pub fn test_links() {
                         .map(|s| format!("   {}", s))
                         .collect::<Vec<_>>()
                         .join("\n");
+                    println!("error");
                     Some(format!(" - {location}:\n{e}"))
                 } else {
+                    println!("ok");
                     None
                 }
             }
@@ -78,7 +80,7 @@ pub fn test_examples() {
     // Run each example
     let mut errors = vec![];
     for target in targets {
-        println!("Running `{}`", target);
+        print!("Running `{}`... ", target);
 
         // To capture stderr as a string
         let stderr = std::process::Stdio::piped();
@@ -92,6 +94,7 @@ pub fn test_examples() {
             Ok(c) => c,
             Err(e) => {
                 errors.push((target, e.to_string()));
+                println!("error");
                 continue;
             }
         };
@@ -100,9 +103,11 @@ pub fn test_examples() {
             Ok(o) if o.status.success() => {}
             Ok(o) => {
                 let err = String::from_utf8_lossy(&o.stderr);
+                println!("error");
                 errors.push((target, err.to_string()));
             }
             Err(e) => {
+                println!("error");
                 errors.push((target, e.to_string()));
             }
         }
@@ -138,7 +143,7 @@ pub fn test_js_examples() {
 
     let mut errors = vec![];
     for target in targets {
-        println!("Running `{}`", target.display());
+        print!("Running `{}`... ", target.display());
 
         if let Err(err) = run_file(&target) {
             let location = target.display();
@@ -146,16 +151,19 @@ pub fn test_js_examples() {
             let err = err.to_string();
             if err.contains("operation canceled") {
                 // Hack for HTTP server example abort
+                println!("cancelled");
                 continue;
             }
 
             let e = err
-                .to_string()
                 .split('\n')
                 .map(|s| format!("   {}", s))
                 .collect::<Vec<_>>()
                 .join("\n");
+            println!("error");
             errors.push(format!(" - {location}:\n   {e}"));
+        } else {
+            println!("ok");
         }
     }
 

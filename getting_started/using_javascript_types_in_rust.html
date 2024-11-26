@@ -155,7 +155,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
     let mut runtime = Runtime::new(Default::default())?;
 
     let number: i32 = runtime.eval(&quot;1 + 1&quot;)?;
-    let string: String = runtime.eval(&quot;1 + 1&quot;)?;
+    let string: String = runtime.eval(&quot;`${1 + 1}`&quot;)?;
     let float: f64 = runtime.eval(&quot;1 + 1&quot;)?;
 
     println!(&quot;Number: {}&quot;, number);

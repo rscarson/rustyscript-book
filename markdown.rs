@@ -152,16 +152,29 @@ impl Link {
             // Check if the URL is reachable
             let url = reqwest::Url::parse(&self.url)
                 .map_err(|e| anyhow::anyhow!("Failed to parse {}: {e}", self.url))?;
-            let url_ = url.clone();
 
             //
             // Check if the URL is reachable
-            let status = client
+            let url_ = url.clone();
+            let mut status = client
                 .head(url.clone())
                 .header("Accept", "text/html")
                 .send()
                 .map_err(move |e| anyhow::anyhow!("{:?}", e.with_url(url_.clone())))?
                 .status();
+
+            //
+            // If we get 'Not Allowed'
+            // try again with a GET request
+            if status == reqwest::StatusCode::METHOD_NOT_ALLOWED {
+                let url_ = url.clone();
+                status = client
+                    .get(url_.clone())
+                    .header("Accept", "text/html")
+                    .send()
+                    .map_err(move |e| anyhow::anyhow!("{:?}", e.with_url(url_.clone())))?
+                    .status();
+            }
 
             //
             // Check if the URL target is valid
