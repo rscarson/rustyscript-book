@@ -10,9 +10,11 @@ static_runtime!(MY_DEFAULT_RUNTIME);
 
 // Or you can provide your own
 static_runtime!(MY_CUSTOM_RUNTIME, {
-    let mut options = RuntimeOptions::default();
-    options.timeout = std::time::Duration::from_secs(5);
-    options
+    let timeout = std::time::Duration::from_secs(5);
+    RuntimeOptions {
+        timeout,
+        ..Default::default()
+    }
 });
 
 fn main() -> Result<(), Error> {

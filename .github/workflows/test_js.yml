@@ -1,0 +1,22 @@
+name: Test JS Examples
+
+on:
+  workflow_run:
+    workflows:
+      - Update Examples
+    types:
+      - completed
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Run tests
+      run: cargo run --bin run_test js

@@ -15,10 +15,10 @@ fn op_add_example(#[bigint] a: i64, #[bigint] b: i64) -> i64 {
 }
 
 extension!(
-    example_extension,                                  // The name of the extension
-    ops = [op_add_example],                             // The ops to include in the extension
-    esm_entry_point = "simple_extension.js",            // The entry point for the extension
-    esm = [ dir "js_examples", "simple_extension.js" ], // The javascript files to include
+    example_extension,                                              // The name of the extension
+    ops = [op_add_example],                                         // The ops to include in the extension
+    esm_entry_point = "ext:example_extension/simple_extension.js",  // The entry point for the extension
+    esm = [ dir "js_examples", "simple_extension.js" ],             // The javascript files to include
 );
 
 fn main() -> Result<(), Error> {

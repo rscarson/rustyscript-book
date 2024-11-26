@@ -8,7 +8,8 @@ repository = "https://github.com/rscarson/rustyscript"
 
 [dependencies]
 reqwest = { version = "=0.12.8", default-features = false, features = ["blocking", "rustls-tls"] }
-rustyscript = { git = "https://github.com/rscarson/rustyscript.git", features = ["node_experimental", "extra_features"] }
+#rustyscript = { git = "https://github.com/rscarson/rustyscript.git", features = ["node_experimental", "extra_features"] }
+rustyscript = { path = "../rustyscript", features = ["node_experimental", "extra_features"] }
 deno_core = "0.321.0"
 anyhow = "1.0.93"
 comrak = "0.29.0"

@@ -21,6 +21,6 @@ fn main() -> Result<(), Error> {
             .await
     })?;
 
-    assert_eq!(value, 32);
+    assert_eq!(value, 42);
     Ok(())
 }
