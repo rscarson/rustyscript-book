@@ -1,4 +1,4 @@
-use rustyscript::{static_runtime, Error, RuntimeOptions};
+use rustyscript::{static_runtime, RuntimeOptions, Error};
 
 // Can have the default options
 static_runtime!(MY_DEFAULT_RUNTIME);
@@ -13,5 +13,7 @@ static_runtime!(MY_CUSTOM_RUNTIME, {
 });
 
 fn main() -> Result<(), Error> {
-    MY_DEFAULT_RUNTIME::with(|runtime| runtime.eval::<()>("console.log('Hello, World!')"))
+    MY_DEFAULT_RUNTIME::with(|runtime| {
+        runtime.eval::<()>("console.log('Hello, World!')")
+    })
 }
