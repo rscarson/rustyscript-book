@@ -145,7 +145,11 @@
                     <main>
                         <h1 id="custom-extensions"><a class="header" href="#custom-extensions">Custom Extensions</a></h1>
 <blockquote>
-<p><strong>Important note:</strong> that the examples in this chapter require your crate to supply the <strong>same version</strong> of <a href="https://crates.io/crates/deno_core"><code>deno_core</code></a> as rustyscript uses - this version can be checked <a href="https://crates.io/crates/rustyscript/latest/dependencies">here</a></p>
+<div class="warning">
+  <strong>Important note</strong>
+<p>The examples in this chapter require your crate to supply the same version of deno_core as rustyscript uses.</p>
+</div>
+<p>The required version of <a href="https://crates.io/crates/deno_core">deno_core</a> can be found in <a href="https://crates.io/crates/rustyscript/latest/dependencies">rustyscript's dependencies</a></p>
 </blockquote>
 <p>The most performant way to extend rustyscript is to use the <code>extension</code> feature of deno_core.<br />
 The following example demonstrates how to create a simple extension that adds two numbers together.</p>
@@ -186,8 +190,11 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 globalThis.my_add = add;
 </code></pre>
 <blockquote>
-<p><strong>Important note:</strong> All javascript files included in an extension MUST be included somewhere.
+<div class="warning">
+  <strong>Important note</strong>
+<p>All javascript files included in an extension MUST be included somewhere.<br/>
 I recommend using the file specified in <code>esm_entry_point</code> to include all other files.</p>
+</div>
 </blockquote>
 <h2 id="op2"><a class="header" href="#op2">Op2</a></h2>
 <p><code>Op2</code> is a deno-provided macro that allows you to define an extension function.</p>

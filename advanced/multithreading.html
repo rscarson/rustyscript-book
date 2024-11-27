@@ -145,12 +145,16 @@
                     <main>
                         <h1 id="multithreading"><a class="header" href="#multithreading">MultiThreading</a></h1>
 <p>rustyscript is not thread-safe, due to limitations of the underlying engine, deno_core</p>
+<blockquote>
+<div class="warning">
+  <strong>Important note</strong>
+<p>You must call <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html"><code>init_platform</code></a> If you are using runtimes on multiple threads.
+The only exception is <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html"><code>WorkerPool</code></a>, which will call init_platform for you.</p>
+</div>
+</blockquote>
+<h2 id="worker-threads"><a class="header" href="#worker-threads">Worker Threads</a></h2>
 <p>The <code>worker</code> feature (enabled by default) gets around this by defining worker threads, which can be used in parallel.<br />
 Workers use queries sent over channels to communicate with the main thread.</p>
-<blockquote>
-<p><strong>Important Note:</strong> You must call <a href="https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html"><code>init_platform</code></a> If you are using runtimes on multiple threads.
-The only exception is <code>WorkerPool</code>, sen below, which will call <code>init_platform</code> for you.</p>
-</blockquote>
 <p><a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.DefaultWorker.html"><code>DefaultWorker</code></a> is a very simple built-in worker implementation:</p>
 <pre><pre class="playground"><code class="language-rust">use deno_core::serde_json;
 use rustyscript::{
@@ -194,10 +198,34 @@ which take care of the query/response boilerplate, as seen <a href="https://gith
 </blockquote>
 <p>However, for many applications the default worker will not be sufficient, in which case you can implement your own worker - <a href="https://github.com/rscarson/rustyscript/blob/master/examples/custom_threaded_worker.rs">See this example</a></p>
 <hr />
-<p>The worker module also provides <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html"><code>WorkerPool</code></a>, which can be used to manage multiple workers.</p>
+<h2 id="worker-pool"><a class="header" href="#worker-pool">Worker Pool</a></h2>
+<p>The worker module also provides <a href="https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html"><code>WorkerPool</code></a>, which can be used to manage multiple workers. It uses a round-robin strategy to assign workers to tasks.</p>
 <ul>
 <li>See <a href="https://github.com/rscarson/rustyscript/blob/master/examples/worker_pool.rs">this example</a></li>
 </ul>
+<pre><pre class="playground"><code class="language-rust">use deno_core::serde_json;
+use rustyscript::{
+    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    Error, Module,
+};
+
+fn main() -&gt; Result&lt;(), Error&gt; {
+    let mut pool = WorkerPool::&lt;DefaultWorker&gt;::new(Default::default(), 4)?;
+
+    // Get the next available worker
+    let worker_a = pool.next_worker();
+    worker_a.borrow.send(DefaultWorkerQuery::Eval(&quot;console.log('Hello from worker A!')&quot;.to_string()))?;
+
+    // Start a long-running task in worker B
+    let worker_b = pool.next_worker();
+    worker_b.borrow.send(DefaultWorkerQuery::Eval(&quot;for (let i = 0; i &lt; 10000000000; i++) {} &quot;.to_string()))?;
+
+    // Wait for worker B to finish
+    worker_b.borrow.receive()?;
+
+    Ok(())
+}
+</code></pre></pre>
 
                     </main>
 

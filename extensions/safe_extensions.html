@@ -146,10 +146,9 @@
                         <h1 id="deno-extensions"><a class="header" href="#deno-extensions">Deno Extensions</a></h1>
 <h2 id="safe-extensions"><a class="header" href="#safe-extensions">Safe Extensions</a></h2>
 <p>All the extensions mentioned below can be activated using the <code>safe_extensions</code> crate feature.</p>
-<p>By default, <code>Rustyscript</code> includes only those extensions that maintain a secure, sandboxed runtime environment.</p>
 <blockquote>
-<p><strong>Important Note</strong><br />
-By default the Javascript code you run have no access to system resources such as the file system, network, or environment variables.</p>
+<p><strong>By default, <code>Rustyscript</code> includes only those extensions that maintain a secure, sandboxed runtime environment.</strong></p>
+<p>This means that the Javascript code you run has no access to system resources such as the file system, network, or environment variables.</p>
 </blockquote>
 <p>The safe extensions included by default are:</p>
 <ul>
@@ -160,10 +159,10 @@ By default the Javascript code you run have no access to system resources such a
 </ul>
 <p>The remaining extensions can be broadly categorized as either <code>io</code> or <code>network</code>.</p>
 <blockquote>
-<p><strong>Important Note</strong><br />
-With the exception of <a href="cron.html"><code>cron</code></a>, <a href="webstorage.html"><code>webstorage</code></a>, and <a href="ffi.html"><code>ffi</code></a><br />
-All the remaining extensions depend on the <a href="web.html"><code>web</code></a> extension.</p>
-</blockquote>
+<div class="warning">
+  <strong>Important note</strong>
+<p>With the exception of <a href="cron.html"><code>cron</code></a>, <a href="webstorage.html"><code>webstorage</code></a>, and <a href="ffi.html"><code>ffi</code></a>, all remaining extensions depend on the <a href="web.html"><code>web</code></a> extension.</p>
+</div></blockquote>
 
                     </main>
 

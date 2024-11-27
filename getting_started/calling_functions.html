@@ -152,9 +152,12 @@
 <p>Arguments can also be references to sized values, such as:<br />
 <code>&amp;&quot;test&quot;.to_string()</code> or <code>&amp;1</code></p>
 <blockquote>
-<p><strong>Important Note:</strong> Up to 16 arguments can be passed in this way<br />
-If you need more than 16 arguments, you can use <a href="https://docs.rs/rustyscript/latest/rustyscript/macro.big_json_args.html"><code>big_json_args!</code></a></p>
-<p>Please note: This macro is significantly slower — benchmark tests show it can be nearly 1,000 times slower than using a smaller argument set. Use sparingly to avoid performance bottlenecks.</p>
+<p>Up to 16 arguments can be passed in this way, if you need more, you can use <a href="https://docs.rs/rustyscript/latest/rustyscript/macro.big_json_args.html"><code>big_json_args!</code></a></p>
+<div class="warning">
+  <strong>Important note</strong>
+<p><code>big_json_args!</code> is significantly slower — benchmark tests show it can be nearly 1,000 times slower than using a smaller argument set.</p>
+<p>Use sparingly to avoid performance bottlenecks.</p>
+</div>
 </blockquote>
 
                     </main>

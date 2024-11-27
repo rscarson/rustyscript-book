@@ -143,27 +143,27 @@
 
                 <div id="content" class="content">
                     <main>
-                        <h1 id="getting-started"><a class="header" href="#getting-started">Getting Started</a></h1>
+                        <p>![Rustyscript - Effortless JS Integration for Rust](../assets/rustyscript-logo-wide.png =500x)</p>
 <p><a href="https://crates.io/crates/rustyscript/"><img src="https://img.shields.io/crates/v/rustyscript.svg" alt="Crates.io" /></a>
 <a href="https://github.com/rscarson/rustyscript/actions?query=branch%3Amaster"><img src="https://github.com/rscarson/rustyscript/actions/workflows/tests.yml/badge.svg?branch=master" alt="Build Status" /></a>
 <a href="https://docs.rs/rustyscript/latest/rustyscript/"><img src="https://img.shields.io/docsrs/rustyscript" alt="docs.rs" /></a>
 <a href="https://rscarson.github.io/rustyscript-book/"><img src="https://img.shields.io/badge/mdbook-user%20guide-blue" alt="Static Badge" /></a>
 <a href="https://raw.githubusercontent.com/rscarson/rustyscript/master/LICENSE"><img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="License" /></a></p>
-<h2 id="rustyscript---effortless-js-integration-for-rust"><a class="header" href="#rustyscript---effortless-js-integration-for-rust">Rustyscript - Effortless JS Integration for Rust</a></h2>
 <p>rustyscript provides a quick and simple way to integrate a runtime javascript or typescript component from within Rust.</p>
 <p>It uses the v8 engine through the <code>deno_core</code> crate, and aims to be as simple as possible to use without sacrificing flexibility or performance.<br />
 I also have attempted to abstract away the v8 engine details so you can for the most part operate directly on rust types.</p>
-<h3 id="core-principles"><a class="header" href="#core-principles">Core Principles</a></h3>
-<h4 id="sandboxed"><a class="header" href="#sandboxed">Sandboxed</a></h4>
-<p>By default, the code being run is entirely sandboxed from the host, having no filesystem or network access.
+<p><strong>Sandboxed</strong><br />
+By default, the code being run is entirely sandboxed from the host, having no filesystem or network access.<br />
 <a href="../extensions">extensions</a> can be added to grant additional capabilities that may violate sandboxing</p>
-<h4 id="flexible"><a class="header" href="#flexible">Flexible</a></h4>
-<p>The runtime is designed to be as flexible as possible, allowing you to modify capabilities, the module loader, and more.</p>
+<p><strong>Flexible</strong><br />
+The runtime is designed to be as flexible as possible, allowing you to modify capabilities, the module loader, and more.</p>
 <ul>
 <li>Asynchronous JS is fully supported, and the runtime can be configured to run in a multithreaded environment.</li>
 <li>Typescript is supported, and will be transpired into JS for execution.</li>
-<li>Node JS is supported experimentally, but is not yet fully compatible <a href="../advanced/nodejs_compatibility.html">See the NodeJS Compatibility section</a></li>
+<li>Node JS is supported experimentally, but is not yet fully compatible (<a href="../advanced/nodejs_compatibility.html">See the NodeJS Compatibility section</a>)</li>
 </ul>
+<p><strong>Unopinionated</strong><br />
+Rustyscript is designed to be a thin wrapper over the Deno runtime, to remove potential pitfalls and simplify the API without sacrificing flexibility or performance.</p>
 <h3 id="extension-features"><a class="header" href="#extension-features">Extension Features</a></h3>
 <p>The crate includes the following features that can be turned on or off as needed:<br />
 For a full list of available extensions, see the <a href="../extensions">extensions</a> section.</p>

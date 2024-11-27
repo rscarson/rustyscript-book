@@ -78,6 +78,12 @@ fn reset_examples(dir: impl AsRef<Path>) -> Result<(), anyhow::Error> {
 }
 
 fn main() -> Result<(), anyhow::Error> {
+    let is_snapshot_only = std::env::args().any(|arg| arg == "--snapshot-only");
+    if is_snapshot_only {
+        generate_snapshot()?;
+        return Ok(());
+    }
+
     // First we clear any examples starting with `auto_`
     reset_examples("examples")?;
     reset_examples("js_examples")?;
