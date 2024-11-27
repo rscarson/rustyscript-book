@@ -155,7 +155,7 @@
 I also have attempted to abstract away the v8 engine details so you can for the most part operate directly on rust types.</p>
 <p><strong>Sandboxed</strong><br />
 By default, the code being run is entirely sandboxed from the host, having no filesystem or network access.<br />
-<a href="../extensions">extensions</a> can be added to grant additional capabilities that may violate sandboxing</p>
+<a href="extensions">extensions</a> can be added to grant additional capabilities that may violate sandboxing</p>
 <p><strong>Flexible</strong><br />
 The runtime is designed to be as flexible as possible, allowing you to modify capabilities, the module loader, and more.</p>
 <ul>
@@ -976,7 +976,7 @@ which take care of the query/response boilerplate, as seen <a href="https://gith
 </ul>
 <pre><pre class="playground"><code class="language-rust">use deno_core::serde_json;
 use rustyscript::{
-    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    worker::{WorkerPool, DefaultWorker, DefaultWorkerQuery},
     Error, Module,
 };
 

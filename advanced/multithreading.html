@@ -205,7 +205,7 @@ which take care of the query/response boilerplate, as seen <a href="https://gith
 </ul>
 <pre><pre class="playground"><code class="language-rust">use deno_core::serde_json;
 use rustyscript::{
-    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    worker::{WorkerPool, DefaultWorker, DefaultWorkerQuery},
     Error, Module,
 };
 
