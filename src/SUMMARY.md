@@ -1,6 +1,6 @@
 # Summary
 
-- [Getting Started](getting_started/README.md)
+- [Getting Started](README.md)
     - [Hello World](getting_started/hello_world.md)
     - [Calling Functions](getting_started/calling_functions.md)
     - [Error Handling](getting_started/errors.md)
