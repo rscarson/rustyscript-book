@@ -1,6 +1,6 @@
 use deno_core::serde_json;
 use rustyscript::{
-    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    worker::{WorkerPool, DefaultWorker, DefaultWorkerQuery},
     Error, Module,
 };
 
