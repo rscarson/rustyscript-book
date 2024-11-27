@@ -20,7 +20,7 @@ By default, the code being run is entirely sandboxed from the host, having no fi
 The runtime is designed to be as flexible as possible, allowing you to modify capabilities, the module loader, and more.  
 - Asynchronous JS is fully supported, and the runtime can be configured to run in a multithreaded environment.  
 - Typescript is supported, and will be transpired into JS for execution.
-- Node JS is supported experimentally, but is not yet fully compatible ([See the NodeJS Compatibility section](../advanced/nodejs_compatibility.md))
+- Node JS is supported experimentally, but is not yet fully compatible ([See the NodeJS Compatibility section](advanced/nodejs_compatibility.md))
 
 **Unopinionated**  
 Rustyscript is designed to be a thin wrapper over the Deno runtime, to remove potential pitfalls and simplify the API without sacrificing flexibility or performance.
@@ -28,7 +28,7 @@ Rustyscript is designed to be a thin wrapper over the Deno runtime, to remove po
 ### Extension Features
 
 The crate includes the following features that can be turned on or off as needed:  
-For a full list of available extensions, see the [extensions](../extensions) section.
+For a full list of available extensions, see the [extensions](extensions) section.
 
 > **`safe_extensions`** `ON BY DEFAULT`  
 > `console` `crypto` `url` `web_stub`  
@@ -60,4 +60,4 @@ For a full list of available extensions, see the [extensions](../extensions) sec
 > Enables the multithreaded [`worker`](https://docs.rs/rustyscript/latest/rustyscript/worker/index.html) API
 
 > **`snapshot_builder`**  
-> Enables the [`snapshot_builder`](../advanced/snapshots.md) API
+> Enables the [`snapshot_builder`](advanced/snapshots.md) API
