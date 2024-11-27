@@ -68,7 +68,7 @@ The worker module also provides [`WorkerPool`](https://docs.rs/rustyscript/lates
 ```rust
 use deno_core::serde_json;
 use rustyscript::{
-    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    worker::{WorkerPool, DefaultWorker, DefaultWorkerQuery},
     Error, Module,
 };
 
