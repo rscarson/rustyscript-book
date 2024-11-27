@@ -1,11 +1,17 @@
 # MultiThreading
 rustyscript is not thread-safe, due to limitations of the underlying engine, deno_core
 
+> <div class="warning">
+>   <strong>Important note</strong>
+>
+>   You must call [`init_platform`](https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html) If you are using runtimes on multiple threads.
+>   The only exception is [`WorkerPool`](https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html), which will call init_platform for you.
+> </div>
+
+## Worker Threads
+
 The `worker` feature (enabled by default) gets around this by defining worker threads, which can be used in parallel.  
 Workers use queries sent over channels to communicate with the main thread.
-
-> **Important Note:** You must call [`init_platform`](https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html) If you are using runtimes on multiple threads.
-> The only exception is `WorkerPool`, sen below, which will call `init_platform` for you.
 
 [`DefaultWorker`](https://docs.rs/rustyscript/latest/rustyscript/worker/struct.DefaultWorker.html) is a very simple built-in worker implementation:
 
@@ -54,5 +60,32 @@ However, for many applications the default worker will not be sufficient, in whi
 
 -----
 
-The worker module also provides [`WorkerPool`](https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html), which can be used to manage multiple workers.
+## Worker Pool
+
+The worker module also provides [`WorkerPool`](https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html), which can be used to manage multiple workers. It uses a round-robin strategy to assign workers to tasks.
 - See [this example](https://github.com/rscarson/rustyscript/blob/master/examples/worker_pool.rs)
+
+```rust
+use deno_core::serde_json;
+use rustyscript::{
+    worker::{DefaultWorker, DefaultWorkerQuery, DefaultWorkerResponse},
+    Error, Module,
+};
+
+fn main() -> Result<(), Error> {
+    let mut pool = WorkerPool::<DefaultWorker>::new(Default::default(), 4)?;
+
+    // Get the next available worker
+    let worker_a = pool.next_worker();
+    worker_a.borrow.send(DefaultWorkerQuery::Eval("console.log('Hello from worker A!')".to_string()))?;
+
+    // Start a long-running task in worker B
+    let worker_b = pool.next_worker();
+    worker_b.borrow.send(DefaultWorkerQuery::Eval("for (let i = 0; i < 10000000000; i++) {} ".to_string()))?;
+
+    // Wait for worker B to finish
+    worker_b.borrow.receive()?;
+
+    Ok(())
+}
+```

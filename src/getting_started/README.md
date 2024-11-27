@@ -1,4 +1,4 @@
-# Getting Started
+![Rustyscript - Effortless JS Integration for Rust](../assets/rustyscript-logo-wide.png =500x)
 
 [![Crates.io](https://img.shields.io/crates/v/rustyscript.svg)](https://crates.io/crates/rustyscript/)
 [![Build Status](https://github.com/rscarson/rustyscript/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/rscarson/rustyscript/actions?query=branch%3Amaster)
@@ -6,23 +6,24 @@
 [![Static Badge](https://img.shields.io/badge/mdbook-user%20guide-blue)](https://rscarson.github.io/rustyscript-book/)
 [![License](https://img.shields.io/badge/license-MIT-blue.svg)](https://raw.githubusercontent.com/rscarson/rustyscript/master/LICENSE)
 
-## Rustyscript - Effortless JS Integration for Rust
 rustyscript provides a quick and simple way to integrate a runtime javascript or typescript component from within Rust.
 
 It uses the v8 engine through the `deno_core` crate, and aims to be as simple as possible to use without sacrificing flexibility or performance.  
 I also have attempted to abstract away the v8 engine details so you can for the most part operate directly on rust types.
 
-### Core Principles
 
-#### Sandboxed
-By default, the code being run is entirely sandboxed from the host, having no filesystem or network access.
+**Sandboxed**  
+By default, the code being run is entirely sandboxed from the host, having no filesystem or network access.  
 [extensions](../extensions) can be added to grant additional capabilities that may violate sandboxing
 
-#### Flexible
+**Flexible**  
 The runtime is designed to be as flexible as possible, allowing you to modify capabilities, the module loader, and more.  
 - Asynchronous JS is fully supported, and the runtime can be configured to run in a multithreaded environment.  
 - Typescript is supported, and will be transpired into JS for execution.
-- Node JS is supported experimentally, but is not yet fully compatible [See the NodeJS Compatibility section](../advanced/nodejs_compatibility.md)
+- Node JS is supported experimentally, but is not yet fully compatible ([See the NodeJS Compatibility section](../advanced/nodejs_compatibility.md))
+
+**Unopinionated**  
+Rustyscript is designed to be a thin wrapper over the Deno runtime, to remove potential pitfalls and simplify the API without sacrificing flexibility or performance.
 
 ### Extension Features
 

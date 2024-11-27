@@ -18,5 +18,8 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: Update examples on master
+      run: cargo run --bin generate_examples --snapshot-only
+
     - name: Run tests
       run: cargo run --bin run_test rust
