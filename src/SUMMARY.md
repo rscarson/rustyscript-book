@@ -1,6 +1,10 @@
 # Summary
 
-- [Getting Started](README.md)
+- [The Rustyscript Book](README.md)
+
+-----
+
+- [Getting Started](getting_started/README.md)
     - [Hello World](getting_started/hello_world.md)
     - [Calling Functions](getting_started/calling_functions.md)
     - [Error Handling](getting_started/errors.md)
