@@ -14,8 +14,7 @@ fn main() -> Result<(), Error> {
 
     // But if we allow it:
     permissions.allow_url("https://example.com");
-    let result = runtime.eval::<()>("await fetch('https://example.com')");
-    assert!(result.is_ok());
+runtime.eval::<()>("await fetch('https://example.com')")?;
 
     Ok(())
 }
