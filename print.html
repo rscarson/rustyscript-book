@@ -1033,12 +1033,12 @@ fn main() -&gt; Result&lt;(), Error&gt; {
     let mut runtime = Runtime::new(options)?;
 
     // Fetching any URL will fail
-    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;);
+    let result = runtime.eval::&lt;()&gt;(&quot;await fetch('https://example.com')&quot;);
     assert!(result.is_err());
 
     // But if we allow it:
     permissions.allow_url(&quot;https://example.com&quot;);
-    let result = runtime.eval::&lt;()&gt;(&quot;fetch('https://example.com')&quot;);
+    let result = runtime.eval::&lt;()&gt;(&quot;await fetch('https://example.com')&quot;);
     assert!(result.is_ok());
 
     Ok(())
