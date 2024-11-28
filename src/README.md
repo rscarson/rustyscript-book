@@ -1,4 +1,4 @@
-![Rustyscript - Effortless JS Integration for Rust](assets/rustyscript-logo-wide.png =500x)
+![Rustyscript - Effortless JS Integration for Rust](assets/rustyscript-logo-wide.png)
 
 [![Crates.io](https://img.shields.io/crates/v/rustyscript.svg)](https://crates.io/crates/rustyscript/)
 [![Build Status](https://github.com/rscarson/rustyscript/actions/workflows/tests.yml/badge.svg?branch=master)](https://github.com/rscarson/rustyscript/actions?query=branch%3Amaster)

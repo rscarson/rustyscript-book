@@ -20,9 +20,6 @@ jobs:
           mdbook-version: '0.4.10'
           # mdbook-version: 'latest'
 
-      - name: Install image preprocessor
-        run: cargo install mdbook-image-size
-
       - run: mdbook build
 
       - name: Deploy

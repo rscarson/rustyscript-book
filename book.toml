@@ -8,6 +8,3 @@ title = "Rustyscript Documentation"
 [output.html]
 [output.html.playground]
 runnable = false
-
-[preprocessor.image-size]
-command = "mdbook-image-size"
