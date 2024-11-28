@@ -985,14 +985,14 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 
     // Get the next available worker
     let worker_a = pool.next_worker();
-    worker_a.borrow.send(DefaultWorkerQuery::Eval(&quot;console.log('Hello from worker A!')&quot;.to_string()))?;
+    worker_a.borrow().send(DefaultWorkerQuery::Eval(&quot;console.log('Hello from worker A!')&quot;.to_string()))?;
 
     // Start a long-running task in worker B
     let worker_b = pool.next_worker();
-    worker_b.borrow.send(DefaultWorkerQuery::Eval(&quot;for (let i = 0; i &lt; 10000000000; i++) {} &quot;.to_string()))?;
+    worker_b.borrow().send(DefaultWorkerQuery::Eval(&quot;for (let i = 0; i &lt; 10000000000; i++) {} &quot;.to_string()))?;
 
     // Wait for worker B to finish
-    worker_b.borrow.receive()?;
+    worker_b.borrow().receive()?;
 
     Ok(())
 }
