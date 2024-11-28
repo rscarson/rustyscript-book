@@ -1038,8 +1038,7 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 
     // But if we allow it:
     permissions.allow_url(&quot;https://example.com&quot;);
-    let result = runtime.eval::&lt;()&gt;(&quot;await fetch('https://example.com')&quot;);
-    assert!(result.is_ok());
+runtime.eval::&lt;()&gt;(&quot;await fetch('https://example.com')&quot;)?;
 
     Ok(())
 }
