@@ -203,10 +203,9 @@ which take care of the query/response boilerplate, as seen <a href="https://gith
 <ul>
 <li>See <a href="https://github.com/rscarson/rustyscript/blob/master/examples/worker_pool.rs">this example</a></li>
 </ul>
-<pre><pre class="playground"><code class="language-rust">use deno_core::serde_json;
-use rustyscript::{
-    worker::{WorkerPool, DefaultWorker, DefaultWorkerQuery},
-    Error, Module,
+<pre><pre class="playground"><code class="language-rust">use rustyscript::{
+    worker::{DefaultWorker, DefaultWorkerQuery, WorkerPool},
+    Error,
 };
 
 fn main() -&gt; Result&lt;(), Error&gt; {
@@ -214,11 +213,15 @@ fn main() -&gt; Result&lt;(), Error&gt; {
 
     // Get the next available worker
     let worker_a = pool.next_worker();
-    worker_a.borrow().send(DefaultWorkerQuery::Eval(&quot;console.log('Hello from worker A!')&quot;.to_string()))?;
+    worker_a.borrow().send(DefaultWorkerQuery::Eval(
+        &quot;console.log('Hello from worker A!')&quot;.to_string(),
+    ))?;
 
     // Start a long-running task in worker B
     let worker_b = pool.next_worker();
-    worker_b.borrow().send(DefaultWorkerQuery::Eval(&quot;for (let i = 0; i &lt; 10000000000; i++) {} &quot;.to_string()))?;
+    worker_b.borrow().send(DefaultWorkerQuery::Eval(
+        &quot;for (let i = 0; i &lt; 10000000000; i++) {} &quot;.to_string(),
+    ))?;
 
     // Wait for worker B to finish
     worker_b.borrow().receive()?;
