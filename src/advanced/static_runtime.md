@@ -35,4 +35,5 @@ thread_local! {
 
 Which provides thread safety, static initialization, interior mutability, and initializer error handling.
 
-> **Note:** While it is possible to initialize a `StaticRuntime` object directly, it is not recommended, as it bypasses the thread_local safety layer.
+> [!NOTE]
+> While it is possible to initialize a `StaticRuntime` object directly, it is not recommended, as it bypasses the thread_local safety layer.

@@ -15,5 +15,6 @@ With the default configuration and crate features, sandboxing is enforced by the
 - **Extension limiting** - Only a subset of extensions are enabled by default, using a safe stub of the deno_web API
     - See the [extensions](../extensions/README.md) section for more information on the available optional extensions
 
-> **Note:** Extension is a Deno term referring to a subset of the JS standard API.
+> [!TIP]
+> Extension is a Deno term referring to a subset of the JS standard API.
 > rustyscript provides these as crate features that can be enabled or disabled at compile time.

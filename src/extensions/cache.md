@@ -7,7 +7,8 @@
 Populates the global `Cache`, `CacheStorage`, and `caches` objects.  
 **Not sandbox safe. Off by default**
 
-> **Note** [query options](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions) are not yet supported for the `Cache.match` method.
+> [!NOTE]
+> [query options](https://w3c.github.io/ServiceWorker/#dictdef-cachequeryoptions) are not yet supported for the `Cache.match` method.
 
 ### Options
 **`RuntimeOptions::extension_options::cache`**

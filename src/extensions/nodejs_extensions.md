@@ -15,7 +15,8 @@ See [NodeJS Compatibility](../advanced/nodejs_compatibility.md) for more informa
 
 Includes a very large set of Deno APIs, most of which are needed to run Deno's NodeJS standard library polyfills.
 
-> **Note:** The list of APIs below is not exhaustive and does not include the NodeJS standard library polyfills themselves.
+> [!NOTE]
+> The list of APIs below is not exhaustive and does not include the NodeJS standard library polyfills themselves.
 
 ### `fs_events`
 Provides `Deno.watchFs`

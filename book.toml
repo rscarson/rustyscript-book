@@ -8,3 +8,5 @@ title = "Rustyscript Documentation"
 [output.html]
 [output.html.playground]
 runnable = false
+
+[preprocessor.alerts]

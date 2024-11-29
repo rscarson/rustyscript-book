@@ -1,12 +1,10 @@
 # MultiThreading
 rustyscript is not thread-safe, due to limitations of the underlying engine, deno_core
 
-> <div class="warning">
->   <strong>Important note</strong>
+> [!WARNING]
 >
->   You must call [`init_platform`](https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html) If you are using runtimes on multiple threads.
->   The only exception is [`WorkerPool`](https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html), which will call init_platform for you.
-> </div>
+> You must call [`init_platform`](https://docs.rs/rustyscript/latest/rustyscript/fn.init_platform.html) If you are using runtimes on multiple threads.  
+> The only exception is [`WorkerPool`](https://docs.rs/rustyscript/latest/rustyscript/worker/struct.WorkerPool.html), which will call init_platform for you.
 
 ## Worker Threads
 

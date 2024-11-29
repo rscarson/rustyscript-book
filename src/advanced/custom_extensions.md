@@ -1,11 +1,8 @@
 # Custom Extensions
-> <div class="warning">
->   <strong>Important note</strong>
+> [!WARNING]
 >
->   The examples in this chapter require your crate to supply the same version of deno_core as rustyscript uses.
-> </div>
->
-> The required version of [deno_core](https://crates.io/crates/deno_core) can be found in [rustyscript's dependencies](https://crates.io/crates/rustyscript/latest/dependencies)
+> The examples in this chapter require your crate to supply the same version of deno_core as rustyscript uses.  
+> - The required version of [deno_core](https://crates.io/crates/deno_core) can be found in [rustyscript's dependencies](https://crates.io/crates/rustyscript/latest/dependencies)
 
 The most performant way to extend rustyscript is to use the `extension` feature of deno_core.  
 The following example demonstrates how to create a simple extension that adds two numbers together.
@@ -51,12 +48,9 @@ export const add = (a, b) => Deno.core.ops.op_add_example(a, b);
 globalThis.my_add = add;
 ```
 
-> <div class="warning">
->   <strong>Important note</strong>
->
->   All javascript files included in an extension MUST be included somewhere.<br/>
->   I recommend using the file specified in `esm_entry_point` to include all other files.
-> </div>
+> [!WARNING]
+> All javascript files included in an extension MUST be included somewhere.  
+> I recommend using the file specified in `esm_entry_point` to include all other files.
 
 ## Op2
 `Op2` is a deno-provided macro that allows you to define an extension function.
