@@ -5,7 +5,14 @@ multilingual = false
 src = "src"
 title = "Rustyscript Documentation"
 
+[theme]
+
+
 [output.html]
+edit-url-template = "https://discord.gg/tTYq4z5Qv9"
+git-repository-url = "https://github.com/rscarson/rustyscript"
+git-repository-icon = "fa-github"
+
 [output.html.playground]
 runnable = false
 
