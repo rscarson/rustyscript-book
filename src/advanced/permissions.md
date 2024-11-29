@@ -19,17 +19,20 @@ fn main() -> Result<(), Error> {
 
     let mut runtime = Runtime::new(options)?;
 
+    // Set up a fetch function
+    runtime.eval::<()>(
+        "globalThis.doFetch = async function() { await fetch('https://example.com') }",
+    )?;
+
     // Fetching any URL will fail
-    let result = runtime.eval::<()>("await fetch('https://example.com')");
-    assert!(result.is_err());
+    assert!(runtime.call_function::<()>(None, "doFetch", &()).is_err());
 
     // But if we allow it:
-    permissions.allow_url("https://example.com");
-runtime.eval::<()>("await fetch('https://example.com')")?;
+    permissions.allow_url("https://example.com/");
+    runtime.call_function::<()>(None, "doFetch", &())?;
 
     Ok(())
 }
-
 ```
 
 > You can also implement the [`WebPermissions`](https://docs.rs/rustyscript/latest/rustyscript/trait.WebPermissions.html) trait yourself, and use that instead for even more precise control.

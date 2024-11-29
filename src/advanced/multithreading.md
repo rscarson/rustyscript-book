@@ -66,10 +66,9 @@ The worker module also provides [`WorkerPool`](https://docs.rs/rustyscript/lates
 - See [this example](https://github.com/rscarson/rustyscript/blob/master/examples/worker_pool.rs)
 
 ```rust
-use deno_core::serde_json;
 use rustyscript::{
-    worker::{WorkerPool, DefaultWorker, DefaultWorkerQuery},
-    Error, Module,
+    worker::{DefaultWorker, DefaultWorkerQuery, WorkerPool},
+    Error,
 };
 
 fn main() -> Result<(), Error> {
@@ -77,11 +76,15 @@ fn main() -> Result<(), Error> {
 
     // Get the next available worker
     let worker_a = pool.next_worker();
-    worker_a.borrow().send(DefaultWorkerQuery::Eval("console.log('Hello from worker A!')".to_string()))?;
+    worker_a.borrow().send(DefaultWorkerQuery::Eval(
+        "console.log('Hello from worker A!')".to_string(),
+    ))?;
 
     // Start a long-running task in worker B
     let worker_b = pool.next_worker();
-    worker_b.borrow().send(DefaultWorkerQuery::Eval("for (let i = 0; i < 10000000000; i++) {} ".to_string()))?;
+    worker_b.borrow().send(DefaultWorkerQuery::Eval(
+        "for (let i = 0; i < 10000000000; i++) {} ".to_string(),
+    ))?;
 
     // Wait for worker B to finish
     worker_b.borrow().receive()?;
